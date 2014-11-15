@@ -1,8 +1,16 @@
+@import "../bootstrap/less/mixins.less";
+
 // Custom variables
-@navbar-default-link-active-bg: #DF8783;
-@navbar-default-color: white;
-@navbar-default-link-color: white;
+@link-color: #328cac;
+@link-hover-color: darken(@link-color, 15%);
+@navbar-default-link-active-bg: @link-color;
+@navbar-default-color: gray;
+@navbar-default-link-color: gray;
+
 
 .navbar-default {
-  #gradient > .vertical(#9B0D0B, #B4242E);
+  #gradient > .vertical(#f5f5f5, white);
 }
+
+@brand-primary: @link-color;
+@brand-success: @brand-primary;
