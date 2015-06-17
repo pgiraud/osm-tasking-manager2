@@ -12,6 +12,7 @@ from ..models import (
     TaskState,
     TaskLock,
     License,
+    Program,
 )
 from pyramid.security import authenticated_userid
 
@@ -231,6 +232,8 @@ def project_edit(request):
     project = DBSession.query(Project).get(id)
 
     licenses = DBSession.query(License).all()
+
+    programs = DBSession.query(Program).all()
     if 'form.submitted' in request.params:
 
         for locale, translation in project.translations.iteritems():
@@ -251,6 +254,15 @@ def project_edit(request):
             license_id = int(request.params['license_id'])
             license = DBSession.query(License).get(license_id)
             project.license = license
+
+        if 'program_id' in request.params and \
+                request.params['program_id'] != "":
+            program_id = int(request.params['program_id'])
+            program = DBSession.query(Program).get(program_id)
+            project.program = program
+        elif 'program_id' in request.params and \
+                request.params['program_id'] == "":
+            project.program = None
 
         if 'private' in request.params and \
                 request.params['private'] == 'on':
@@ -299,6 +311,7 @@ def project_edit(request):
         features.append(Feature(geometry=shape.to_shape(area.geometry)))
 
     return dict(page_id='project_edit', project=project, licenses=licenses,
+                programs=programs,
                 translations=translations,
                 priority_areas=FeatureCollection(features))
 

@@ -22,6 +22,17 @@ from osmtm.mako_filters import markdown_filter
   ${_('Access to this project is limited')}
 </p>
 % endif
+<hr />
+<dl>
+  % if project.program:
+  <dt>
+    ${_('Linked to Program')}
+  </dt>
+  <dd>
+    ${project.program.name}
+  </dd>
+  % endif
+</dl>
 <p>${project.description | markdown_filter, n}</p>
 <p class="text-center">
   <a class="btn btn-success btn-lg instructions">

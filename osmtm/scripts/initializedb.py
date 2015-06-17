@@ -16,6 +16,7 @@ from ..models import (
     Project,
     Task,
     License,
+    Program,
     Base,
 )
 
@@ -89,6 +90,11 @@ def main():
         license2.plain_text = "Astrium GEO-Information Services and UNOSAT are allowing access to this imagery for creating information in OpenStreetMap. Other uses are not allowed."  # noqa
         DBSession.add(license2)
 
+        program1 = Program()
+        program1.name = 'Haiti'
+        program1.description = "Just a few hours after the 7.0 magnitude earthquake hit Haiti in January 2010 the OpenStreetMap Community began tracing.... What did they begin tracing? Roads in the beginning all from imagery...."  # noqa
+        DBSession.add(program1)
+
         project = Project(
             'Kathmandu - Map all primary roads and buildings'
         )
@@ -99,6 +105,7 @@ def main():
         project.entities_to_map = "primary roads, buildings"
         project.imagery = "tms[22]:http://hiu-maps.net/hot/1.0.0/kathmandu_flipped/{zoom}/{x}/{y}.png"  # noqa
         project.license = license1
+        project.program = program1
         DBSession.add(project)
 
         with project.force_locale('fr'):

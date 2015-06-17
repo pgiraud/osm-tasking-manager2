@@ -458,6 +458,7 @@ class Project(Base, Translatable):
     tasks = relationship(Task, backref='project',
                          cascade="all, delete, delete-orphan")
     license_id = Column(Integer, ForeignKey('licenses.id'))
+    program_id = Column(Integer, ForeignKey('program.id'))
 
     zoom = Column(Integer)  # is not None when project is auto-filled (grid)
     imagery = Column(Unicode)
@@ -639,6 +640,18 @@ class License(Base):
     plain_text = Column(Unicode)
     projects = relationship("Project", backref='license')
     users = relationship("License", secondary=users_licenses_table)
+
+    def __init__(self):
+        pass
+
+
+class Program(Base):
+    __tablename__ = "program"
+    id = Column(Integer, primary_key=True)
+    name = Column(Unicode)
+    description = Column(Unicode)
+    # thumbnail column to be added later
+    projects = relationship("Project", backref='program')
 
     def __init__(self):
         pass

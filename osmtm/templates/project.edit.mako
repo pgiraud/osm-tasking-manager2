@@ -193,6 +193,26 @@ geometry = loads(str(project.area.geometry.data))
         </div>
       </div>
     </div>
+
+    <!-- Program -->
+    <div class="row">
+      <div class="col-md-4">
+        <div class="form-group">
+          <label class="control-label" for="id_program">${_('Program')}</label>
+          <select id="id_program" name="program_id" class="form-control col-md-6">
+            <option value="">-- No Program --</option>
+            % for p in programs:
+            <%
+            selected = ""
+            if project.program is not None and p.id == project.program.id:
+              selected = "selected"
+            %>
+            <option value="${p.id}" ${selected}>${p.name}</a>
+            %endfor
+          </select>
+        </div>
+      </div>
+    </div>
 </%block>
 
 <%block name="instructions">

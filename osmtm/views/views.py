@@ -35,6 +35,11 @@ from sqlalchemy.orm import joinedload
 
 @view_config(route_name='home', renderer='home.mako')
 def home(request):
+    return dict(page_id="home")
+
+
+@view_config(route_name='projects', renderer='projects.mako')
+def projects(request):
     check_project_expiration()
 
     # no user in the DB yet
@@ -43,9 +48,9 @@ def home(request):
         request.override_renderer = 'start.mako'
         return dict(page_id="start")
 
-    paginator = get_projects(request, 10)
+    paginator = list_projects(request)
 
-    return dict(page_id="home", paginator=paginator)
+    return dict(page_id="projects", paginator=paginator)
 
 
 @view_config(route_name='home_json', renderer='json')
@@ -53,12 +58,12 @@ def home_json(request):
     if not request.is_xhr:
         request.response.content_disposition = \
             'attachment; filename="hot_osmtm.json"'
-    paginator = get_projects(request, 100)
+    paginator = list_projects(request, items_per_page=100)
     request.response.headerlist.append(('Access-Control-Allow-Origin', '*'))
     return FeatureCollection([project.to_feature() for project in paginator])
 
 
-def get_projects(request, items_per_page):
+def list_projects(request, items_per_page=10):
     query = DBSession.query(Project) \
         .options(joinedload(Project.translations['en'])) \
         .options(joinedload(Project.translations[request.locale_name])) \
@@ -103,6 +108,11 @@ def get_projects(request, items_per_page):
                        .filter(search_filter) \
                        .all()
         filter = and_(Project.id.in_(ids), filter)
+
+    # filter projects for a given program
+    if 'program' in request.matchdict:
+        program = request.matchdict.get('program')
+        filter = and_(Project.program_id == program, filter)
 
     # filter projects on which the current user worked on
     if request.params.get('my_projects', '') == 'on':

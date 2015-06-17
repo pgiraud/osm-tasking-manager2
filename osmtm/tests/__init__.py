@@ -10,6 +10,7 @@ from osmtm.models import (
     License,
     Area,
     Project,
+    Program,
     DBSession,
 )
 from sqlalchemy_i18n.manager import translation_manager
@@ -64,6 +65,11 @@ def populate_db():
     license.description = u'the_description_for_license_bar'
     license.plain_text = u'the_plain_text_for_license_bar'
     DBSession.add(license)
+
+    program = Program()
+    program.name = u'ProgramName'
+    program.description = u'the_description_for_program'
+    DBSession.add(program)
 
     shape = shapely.geometry.Polygon(
         [(7.23, 41.25), (7.23, 41.12), (7.41, 41.20)])

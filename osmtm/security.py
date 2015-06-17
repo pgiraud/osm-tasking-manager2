@@ -25,6 +25,7 @@ class RootFactory(object):
         (Allow, Everyone, 'project_show'),
         (Allow, 'group:admin', 'add'),
         (Allow, 'group:admin', 'license_edit'),
+        (Allow, 'group:admin', 'program_edit'),
         (Allow, 'group:admin', 'user_edit'),
         (Allow, 'group:admin', 'project_edit'),
         (Allow, 'group:project_manager', 'project_edit'),

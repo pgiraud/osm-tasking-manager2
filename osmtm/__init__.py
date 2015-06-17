@@ -66,6 +66,7 @@ def main(global_config, **settings):
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
     config.add_route('oauth_callback', '/oauth_callback')
+    config.add_route('projects', '/projects')
     config.add_route('project_new', '/project/new')
     config.add_route('project_new_grid', '/project/new/grid')
     config.add_route('project_new_arbitrary', '/project/new/arbitrary')
@@ -139,6 +140,12 @@ def main(global_config, **settings):
     config.add_route('license_delete', '/license/{license:\d+}/delete')
 
     config.add_route('message_read', '/message/read/{message:\d+}')
+
+    config.add_route('programs', '/programs')
+    config.add_route('program_new', '/program/new')
+    config.add_route('program', '/program/{program}')
+    config.add_route('program_edit', '/program/{program}/edit')
+    config.add_route('program_delete', '/program/{program}/delete')
 
     config.add_translation_dirs('osmtm:locale')
     config.set_locale_negotiator('osmtm.i18n.custom_locale_negotiator')

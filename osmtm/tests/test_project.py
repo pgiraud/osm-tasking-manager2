@@ -182,6 +182,7 @@ class TestProjectFunctional(BaseTestCase):
                                    'form.submitted': True,
                                    'imagery': 'imagery_bar',
                                    'license_id': 1,
+                                   'program_id': 1,
                                    'name_fr': 'the_name_in_french',
                                    'priority': 2,
                                    'status': 2,
@@ -199,6 +200,7 @@ class TestProjectFunctional(BaseTestCase):
                          params={
                              'form.submitted': True,
                              'license_id': 1,
+                             'program_id': 1,
                              'priority': 2,
                              'status': 2,
                              'private': 'on',
@@ -218,6 +220,7 @@ class TestProjectFunctional(BaseTestCase):
                           params={
                               'form.submitted': True,
                               'license_id': 1,
+                              'program_id': 1,
                               'priority': 2,
                               'status': 2,
                           },
@@ -248,6 +251,51 @@ class TestProjectFunctional(BaseTestCase):
         import datetime
         date = datetime.datetime.strptime(date_str, "%m/%d/%Y")
         self.assertEqual(project.due_date, date)
+
+    def test_project_edit__submitted_program(self):
+        headers = self.login_as_admin()
+        project_id = self.create_project()
+        self.testapp.post('/project/%d/edit' % project_id,
+                          headers=headers,
+                          params={
+                              'form.submitted': True,
+                              'priority': 2,
+                              'status': 2,
+                              'program_id': 1
+                          },
+                          status=302)
+
+        from osmtm.models import Project, DBSession
+        project = DBSession.query(Project).get(project_id)
+        self.assertEqual(project.program_id, 1)
+
+        self.testapp.post('/project/%d/edit' % project_id,
+                          headers=headers,
+                          params={
+                              'form.submitted': True,
+                              'priority': 2,
+                              'status': 2,
+                              'program_id': 2
+                          },
+                          status=302)
+
+        from osmtm.models import Project, DBSession
+        project = DBSession.query(Project).get(project_id)
+        self.assertEqual(project.program_id, 2)
+
+        self.testapp.post('/project/%d/edit' % project_id,
+                          headers=headers,
+                          params={
+                              'form.submitted': True,
+                              'priority': 2,
+                              'status': 2,
+                              'program_id': 0
+                          },
+                          status=302)
+
+        from osmtm.models import Project, DBSession
+        project = DBSession.query(Project).get(project_id)
+        self.assertEqual(project.program_id, None)
 
     def test_project_edit__submitted_priority_areas(self):
         headers = self.login_as_admin()

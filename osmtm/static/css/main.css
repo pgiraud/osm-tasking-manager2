@@ -5546,15 +5546,6 @@ h1 {
   color: #666;
   margin: 0;
 }
-#home .project {
-  padding: 10px 10px 5px 10px;
-}
-#home .project h4 {
-  margin: 0;
-}
-#home .project img {
-  max-width: 300px;
-}
 #home .archived,
 #home .draft {
   background: url(../img/closed_back.gif) transparent;
@@ -5563,21 +5554,6 @@ h1 {
 #home .archived a,
 #home .draft a {
   color: grey;
-}
-#home ul.project-stats {
-  float: right;
-  font-size: 11px;
-  margin-bottom: 0;
-}
-#home ul.project-stats li {
-  float: left;
-  margin-left: 10px;
-  color: #666;
-}
-#home ul.project-stats .progress {
-  height: 10px;
-  width: 30px;
-  margin-bottom: 0;
 }
 #project #main_content {
   position: absolute;
@@ -6021,4 +5997,28 @@ h1 {
 .user-admin,
 .user-project-manager {
   text-shadow: 0 0 2px black;
+}
+.project {
+  padding: 10px 10px 5px 10px;
+}
+.project h4 {
+  margin: 0;
+}
+.project img {
+  max-width: 300px;
+}
+ul.project-stats {
+  float: right;
+  font-size: 11px;
+  margin-bottom: 0;
+}
+ul.project-stats li {
+  float: left;
+  margin-left: 10px;
+  color: #666;
+}
+ul.project-stats .progress {
+  height: 10px;
+  width: 30px;
+  margin-bottom: 0;
 }
