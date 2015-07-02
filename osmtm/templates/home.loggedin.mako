@@ -22,11 +22,11 @@
       % endif
     </div>
     <div class="col-md-4">
-      <h2>Have you seen these projects?</h2>
+      <h2>Have you seen these programs?</h2>
       % for program in programs:
         <div class="well">
           <h4>
-            <span class="badge program">Program</span>
+            <i class="glyphicon glyphicon-briefcase"></i>
             <a href="${request.route_path('program', program=program.id)}">${program.name}</a>
           </h4>
           <div>

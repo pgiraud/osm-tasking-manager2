@@ -3,6 +3,7 @@
 <%def name="title()">${'#%d - %s' % (project.id, project.name)}</%def>
 <%block name="header">
 <h1 class="title">
+  <i class="glyphicon glyphicon-th"></i>
   #${project.id} - ${project.name}
   % if project.status == project.status_draft:
    (${_('Draft')})

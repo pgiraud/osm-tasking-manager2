@@ -54,7 +54,7 @@
     </li>
   </ul>
   <h3 class="title">
-    <span class="badge project">Project</span>
+    <i class="glyphicon glyphicon-th"></i>
     <a href="${base_url}project/${project.id}">#${project.id} ${project.name}
     </a>
   </h3>

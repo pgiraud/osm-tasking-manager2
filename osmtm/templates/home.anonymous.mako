@@ -17,7 +17,7 @@
       <div class="col-md-4">
         <div class="well">
           <h4>
-            <span class="badge program">Program</span>
+            <i class="glyphicon glyphicon-briefcase"></i>
             <a href="${request.route_path('program', program=program.id)}">${program.name}</a>
           </h4>
           <div>

@@ -6021,12 +6021,11 @@ ul.project-stats .progress {
   width: 30px;
   margin-bottom: 0;
 }
-.badge {
-  vertical-align: middle;
-}
-.badge.program {
-  background-color: orange;
-}
+.badge.program,
 .badge.project {
-  background-color: purple;
+  vertical-align: middle;
+  font-size: 1em;
+  border-radius: 2px;
+  background-color: transparent;
+  color: grey;
 }

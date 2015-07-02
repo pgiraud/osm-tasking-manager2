@@ -4,7 +4,7 @@
 
 <%block name="header">
   <h1>
-    <span class="badge program">Program</span>
+    <i class="glyphicon glyphicon-briefcase"></i>
     ${program.name}
   </h1>
 </%block>
