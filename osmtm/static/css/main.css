@@ -5550,6 +5550,9 @@ body {
 #home .draft a {
   color: grey;
 }
+#project .title {
+  margin: 0;
+}
 #project #main_content {
   position: absolute;
   left: 0;
