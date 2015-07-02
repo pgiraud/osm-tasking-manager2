@@ -36,13 +36,6 @@ from sqlalchemy.orm import joinedload
 
 @view_config(route_name='home', renderer='home.mako')
 def home(request):
-    programs = DBSession.query(Program).all()
-
-    return dict(page_id="home", programs=programs)
-
-
-@view_config(route_name='projects', renderer='projects.mako')
-def projects(request):
     check_project_expiration()
 
     # no user in the DB yet
@@ -50,6 +43,22 @@ def projects(request):
                 .count() == 0:   # pragma: no cover
         request.override_renderer = 'start.mako'
         return dict(page_id="start")
+
+    programs = DBSession.query(Program).all()
+
+    # no user in the DB yet
+    if DBSession.query(User).filter(User.role == User.role_admin) \
+                .count() == 0:   # pragma: no cover
+        request.override_renderer = 'start.mako'
+        return dict(page_id="start")
+
+    paginator = list_projects(request)
+
+    return dict(page_id="home", programs=programs, projects=paginator)
+
+
+@view_config(route_name='projects', renderer='projects.mako')
+def projects(request):
 
     paginator = list_projects(request)
 
