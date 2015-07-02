@@ -11,6 +11,15 @@ sorts = [('priority', 'asc', _('High priority first')),
 %>
 <div class="container">
   <div class="col-md-6">
+    % for program in programs:
+      <h4>
+        <a href="${request.route_path('program', program=program.id)}">${program.name}</a>
+        <a href="${request.route_path('program_edit', program=program.id)}" class="btn pull-right">${_('Edit')}</a><br />
+      </h4>
+      <div>
+        ${program.description}
+      </div>
+    % endfor
   </div>
   <div class="col-md-6">
     <h3>${_('About the Tasking Manager')}</h3>

@@ -11,6 +11,7 @@ from sqlalchemy import (
 
 from ..models import (
     DBSession,
+    Program,
     Project,
     ProjectTranslation,
     User,
@@ -35,7 +36,9 @@ from sqlalchemy.orm import joinedload
 
 @view_config(route_name='home', renderer='home.mako')
 def home(request):
-    return dict(page_id="home")
+    programs = DBSession.query(Program).all()
+
+    return dict(page_id="home", programs=programs)
 
 
 @view_config(route_name='projects', renderer='projects.mako')
