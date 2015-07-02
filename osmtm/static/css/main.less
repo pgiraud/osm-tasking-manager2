@@ -9,6 +9,10 @@
 
 @import "../js/lib/At.js/css/jquery.atwho.css";
 
+@font-size-h1: floor((@font-size-base * 2.15));
+@font-size-h2: floor((@font-size-base * 1.7));
+@font-size-h3: floor((@font-size-base * 1.25));
+
 // Mixins
 .box-shadow(@horizontal: 0px, @vertical: 1px, @blur: 2px, @spread: 2px, @color: #CCC) {
   -webkit-box-shadow: @horizontal @vertical @blur @spread @color;
@@ -31,14 +35,6 @@ html, body {
     padding-top: 30px;
     line-height: 18px;
 }
-
-h1 {
-  margin: 0;
-  font-size: 20px;
-  height: 36px;
-  line-height: 30px;
-}
-
 
 .footer {
   background-color: #eee;
@@ -562,10 +558,10 @@ h1 {
     text-shadow: 0 0 2px black;
 }
 
-.project {
+.well.project {
     padding: 10px 10px 5px 10px;
 
-    h4 {
+    .title {
         margin: 0;
     }
     img {
@@ -587,4 +583,14 @@ ul.project-stats {
         width: 30px;
         margin-bottom: 0;
     }
+}
+
+.badge {
+  vertical-align: middle;
+  &.program {
+    background-color: orange;
+  }
+  &.project {
+    background-color: purple;
+  }
 }

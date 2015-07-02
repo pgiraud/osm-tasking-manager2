@@ -13,7 +13,7 @@ base_url = request.route_path('home')
     <div class="col-md-8">
       % for program in programs:
         <h4>
-          <a href="${base_url}program/${program.id}">${program.name}</a>
+          <a href="${request.route_path('program', program=program.id)}">${program.name}</a>
           <a href="${request.route_path('program_edit', program=program.id)}" class="btn pull-right">${_('Edit')}</a><br />
         </h4>
         <div>

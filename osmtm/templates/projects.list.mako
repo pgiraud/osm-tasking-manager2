@@ -53,10 +53,11 @@
       </table>
     </li>
   </ul>
-  <h4>
+  <h3 class="title">
+    <span class="badge project">Project</span>
     <a href="${base_url}project/${project.id}">#${project.id} ${project.name}
     </a>
-  </h4>
+  </h3>
   <div class="clear"></div>
   <div class="world_map">
     % if project.area:

@@ -79,7 +79,7 @@ ${message | n}
     </div>
 % endif
   <div class="container">
-    <div class="row"><%block name="header"></%block></div>
+    <div class="row"><div class="col-md-12"><%block name="header"></%block></div></div>
   </div>
 % if  request.session.peek_flash('success'):
     <div class="container">
