@@ -26,7 +26,7 @@
       % for program in programs:
         <div class="well">
           <h4>
-            <span class="badge program">Program</span>
+            <span class="badge program"><i class="glyphicon glyphicon-briefcase"></i> Program</span>
             <a href="${request.route_path('program', program=program.id)}">${program.name}</a>
           </h4>
           <div>
