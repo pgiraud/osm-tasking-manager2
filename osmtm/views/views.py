@@ -46,12 +46,6 @@ def home(request):
 
     programs = DBSession.query(Program).all()
 
-    # no user in the DB yet
-    if DBSession.query(User).filter(User.role == User.role_admin) \
-                .count() == 0:   # pragma: no cover
-        request.override_renderer = 'start.mako'
-        return dict(page_id="start")
-
     paginator = list_projects(request)
 
     return dict(page_id="home", programs=programs, projects=paginator)
