@@ -589,12 +589,15 @@ ul.project-stats {
 }
 
 .badge {
-  &.program,
-  &.project {
-    vertical-align: middle;
-    font-size: 1em;
-    border-radius: 2px;
-    background-color: transparent;
-    color: grey;
-  }
+    &.program,
+    &.project {
+        vertical-align: middle;
+        .border-radius(2px);
+    }
+    &.program {
+        background-color: #4488FF;
+    }
+    &.project {
+        background-color: purple;
+    }
 }
