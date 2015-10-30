@@ -70,7 +70,7 @@ else:
   <div id="side-col">
     <div class="tab-content">
       <div id="activity" class="row-fluid tab-pane">
-        <%include file="task.history.mako" args="section='project'"/>
+        <%include file="task.history.mako"/>
       </div>
       <div id="description" class="tab-pane active">
         <%include file="project.description.mako" />

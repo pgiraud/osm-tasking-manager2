@@ -2,12 +2,7 @@
   <div class="row">
     <div class="col-md-8">
       <h2>Your latest mapping</h2>
-      <ul>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-      </ul>
+        <%include file="task.history.mako" />
     </div>
     <div class="col-md-4">
       <h2>Did you know?</h2>

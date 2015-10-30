@@ -16,6 +16,7 @@ from ..models import (
     ProjectTranslation,
     User,
     TaskLock,
+    TaskState,
 )
 
 from webhelpers.paginate import (
@@ -48,7 +49,29 @@ def home(request):
 
     paginator = list_projects(request)
 
-    return dict(page_id="home", programs=programs, projects=paginator)
+    history = None
+
+    user_id = authenticated_userid(request)
+    user = None
+    if user_id is not None:
+        user = DBSession.query(User).get(user_id)
+
+        filter = TaskState.user == user
+        states = DBSession.query(TaskState).filter(filter) \
+            .order_by(TaskState.date).limit(5).all()
+
+        filter = TaskLock.user == user
+        locks = DBSession.query(TaskLock).filter(filter) \
+            .order_by(TaskLock.date).limit(5).all()
+
+        history = states + locks
+
+        history = sorted(history, key=lambda step: step.date, reverse=True)
+        history = history[:5]
+
+
+    return dict(page_id="home", programs=programs, projects=paginator,
+                history=history)
 
 
 @view_config(route_name='projects', renderer='projects.mako')
