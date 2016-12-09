@@ -89,38 +89,45 @@ def get_projects(request, items_per_page):
 
         '''This pulls out search strings with "label:" from the query
            and searches for project labels that match those strings.'''
-        t = re.findall('label:\S+', s)
-        if t:
-            s = re.sub('label:\S+', '', s)
-            labels = DBSession.query(Label) \
-                            .filter(or_(*[Label.name.ilike('%%%s%%' % label[4:])
-                                          for label in t])).all()
-            if len(labels) > 0:
-                label_ids = DBSession.query(Project.id) \
-                          .filter(and_(*[Project.labels.any(id=label.id)
-                                         for label in labels])).all()
-                filter = and_(Project.id.in_(label_ids), filter)
-        else:
-            labels = None
+        label_regex = r"label:(\"([^\"]+)\"|'([^']+)'|(\S+))\s*"
+        matches = re.finditer(label_regex, s)
 
-        search_filter = or_(PT.name.ilike('%%%s%%' % s),
-                            PT.short_description.ilike('%%%s%%' % s),
-                            PT.description.ilike('%%%s%%' % s),)
-        '''The below code extracts all the numerals in the
-           search string as a list, if there are some it
-           joins that list of number characters into a string,
-           casts it as an integer and searchs to see if there
-           is a project with that id. If there is, it adds
-           it to the search results.'''
-        digits = re.findall('\d+', s)
-        if digits:
-            search_filter = or_(
-                ProjectTranslation.id == (int(''.join(digits))),
-                search_filter)
-        ids = DBSession.query(ProjectTranslation.id) \
-                       .filter(search_filter) \
-                       .all()
-        filter = and_(Project.id.in_(ids), filter)
+        labels = []
+        for num, match in enumerate(matches):
+            '''We don't want the first group of the match since it's the full
+               text'''
+            labels.append([g for g in match.groups()[1::] if g is not None][0])
+
+        if len(labels) > 0:
+            ids = DBSession.query(Project.id) \
+                      .filter(and_(*[Project.labels.any(name=label)
+                                     for label in labels])).all()
+            filter = and_(Project.id.in_(ids), filter)
+
+        '''Remove any label from the search strings and move on to the next
+           search criteria'''
+        s = re.sub(label_regex, '', s).strip()
+
+        if s != '':
+            search_filter = or_(PT.name.ilike('%%%s%%' % s),
+                                PT.short_description.ilike('%%%s%%' % s),
+                                PT.description.ilike('%%%s%%' % s),)
+
+            '''The below code extracts all the numerals in the
+               search string as a list, if there are some it
+               joins that list of number characters into a string,
+               casts it as an integer and searchs to see if there
+               is a project with that id. If there is, it adds
+               it to the search results.'''
+            digits = re.findall('\d+', s)
+            if digits:
+                search_filter = or_(
+                    ProjectTranslation.id == (int(''.join(digits))),
+                    search_filter)
+            ids = DBSession.query(ProjectTranslation.id) \
+                           .filter(search_filter) \
+                           .all()
+            filter = and_(Project.id.in_(ids), filter)
 
     else:
         labels = None

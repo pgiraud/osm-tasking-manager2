@@ -30,7 +30,7 @@ class TestLabelFunctional(BaseTestCase):
                           },
                           status=302)
 
-        self.assertEqual(DBSession.query(Label).count(), 2)
+        self.assertEqual(DBSession.query(Label).count(), 3)
 
     def test_label_edit__forbidden(self):
         self.testapp.get('/label/1/edit', status=403)
@@ -43,16 +43,28 @@ class TestLabelFunctional(BaseTestCase):
         self.testapp.get('/label/1/edit', headers=headers, status=200)
 
     def test_label_edit__submitted(self):
+        import transaction
         from osmtm.models import DBSession, Label
         headers = self.login_as_admin()
-        self.testapp.post('/label/1/edit', headers=headers,
+
+        label = Label()
+        label.name = 'some name'
+        DBSession.add(label)
+        DBSession.flush()
+        label_id = label.id
+        transaction.commit()
+
+        self.testapp.post('/label/%s/edit' % label_id, headers=headers,
                           params={
                               'form.submitted': True,
                               'name': 'changed_name'
                           },
                           status=302)
 
-        self.assertEqual(DBSession.query(Label).get(1).name, u'changed_name')
+        self.assertEqual(DBSession.query(Label).get(label_id).name,
+                         u'changed_name')
+        DBSession.delete(label)
+        transaction.commit()
 
     def test_label_delete__forbidden(self):
         self.testapp.get('/label/3/delete', status=403)
@@ -74,7 +86,7 @@ class TestLabelFunctional(BaseTestCase):
         self.testapp.get('/label/%d/delete' % label_id,
                          headers=headers, status=302)
 
-        self.assertEqual(DBSession.query(Label).count(), 1)
+        self.assertEqual(DBSession.query(Label).count(), 2)
 
     def test_label_delete__doesnt_exist(self):
         headers = self.login_as_admin()

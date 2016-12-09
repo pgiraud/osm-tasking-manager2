@@ -68,18 +68,24 @@ def populate_db():
     license.plain_text = u'the_plain_text_for_license_bar'
     DBSession.add(license)
 
-    label = Label()
-    label.name = u'LabelBar'
-    DBSession.add(label)
+    label0 = Label()
+    label0.name = u'bar'
+    DBSession.add(label0)
+
+    label1 = Label()
+    label1.name = u'dude label'
+    DBSession.add(label1)
 
     shape = shapely.geometry.Polygon(
         [(7.23, 41.25), (7.23, 41.12), (7.41, 41.20)])
     geometry = geoalchemy2.shape.from_shape(shape, 4326)
     area = Area(geometry)
     project = Project(u'test project')
+    project.short_description = u'lorem ipsum description'
     project.area = area
     project.auto_fill(12)
     project.status = Project.status_published
+    project.labels = [label0, label1]
     DBSession.add(project)
 
     transaction.commit()

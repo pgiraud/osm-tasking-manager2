@@ -20,6 +20,12 @@
 
 <%def name="display_project_labels(project)">
   % for label in project.labels:
-  <a class="label label-default" href="${request.route_url('home', _query={'search': 'label:' + label.name})}">${label.name}</a>
+    <%
+      import re
+      label_id = label.name
+      if re.findall(ur'\s', label_id):
+        label_id = '\"' + label_id + '\"'
+    %>
+  <a class="label label-default" href="${request.route_url('home', _query={'search': 'label:' + label_id})}">${label.name}</a>
   % endfor
 </%def>
