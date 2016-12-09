@@ -461,10 +461,10 @@ project_priority_areas = Table(
 )
 
 
-project_tags_table = Table(
-    'project_tags', Base.metadata,
+project_labels_table = Table(
+    'project_labels', Base.metadata,
     Column('project', Integer, ForeignKey('project.id')),
-    Column('tag', Integer, ForeignKey('tags.id')))
+    Column('label', Integer, ForeignKey('label.id')))
 
 
 # A project corresponds to a given mapping job to do on a given area
@@ -523,7 +523,7 @@ class Project(Base, Translatable):
     priority_areas = relationship(PriorityArea,
                                   secondary=project_priority_areas)
 
-    tags = relationship("Tag", secondary=project_tags_table)
+    labels = relationship("Label", secondary=project_labels_table)
 
     def __init__(self, name, user=None):
         self.name = name
@@ -717,23 +717,14 @@ class Message(Base):
         self.message = message
 
 
-class Tag(Base, Translatable):
-    __tablename__ = 'tags'
+class Label(Base):
+    __tablename__ = 'label'
     id = Column(Integer, primary_key=True)
-    name = Column(Unicode)
-    admin_description = Column(Unicode)
-    projects = relationship("Project", secondary=project_tags_table)
+    name = Column(Unicode, nullable=False)
+    projects = relationship("Project", secondary=project_labels_table)
 
-    locale = 'en'
-
-    def __init__(self, name='', admin_description=''):
+    def __init__(self):
         pass
-
-
-class TagTranslation(translation_base(Tag)):
-    __tablename__ = 'tags_translation'
-
-    spotlight_text = Column(Unicode, default=u'')
 
 
 class ExtendedJSONEncoder(JSONEncoder):

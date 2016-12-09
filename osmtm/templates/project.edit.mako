@@ -136,7 +136,7 @@ geometry = loads(str(project.area.geometry.data))
           <li><a href="#imagery" data-toggle="tab">${_('Imagery')}</a></li>
           <li><a id="priority_areas_tab" href="#priority_areas" data-toggle="tab">${_('Priority Areas')}</a></li>
           <li><a href="#allowed_users" data-toggle="tab">${_('Allowed Users')}</a></li>
-          <li><a href="#tags" data-toggle="tab">${_('Project Tags')}</a></li>
+          <li><a href="#labels" data-toggle="tab">${_('Labels')}</a></li>
           <li><a href="#misc" data-toggle="tab">${_('Misc')}</a></li>
         </ul>
         <div class="tab-content">
@@ -158,8 +158,8 @@ geometry = loads(str(project.area.geometry.data))
           <div class="tab-pane" id="allowed_users">
             ${allowed_users()}
           </div>
-          <div class="tab-pane" id="tags">
-            ${tags_()}
+          <div class="tab-pane" id="labels">
+            ${labels_()}
           </div>
           <div class="tab-pane" id="misc">
             ${misc()}
@@ -456,17 +456,17 @@ geometry = loads(str(project.area.geometry.data))
 </script>
 </%block>
 
-<%block name="tags_">
+<%block name="labels_">
 <div class="form-group">
-  <label class="control-label">${_('Select or deselect the project tags to associate with this project.')}</label><br />
-    % for t in tags:
+  <label class="control-label">${_('Apply labels to this project.')}</label><br />
+    % for l in labels:
     <%
     checked = ""
-    if project.tags is not None and t in project.tags:
+    if project.labels is not None and l in project.labels:
       checked = "checked"
     %>
     <div class="checkbox">
-        <label><input type="checkbox" name="tag_${t.id}" ${checked}>${t.name}</label>
+        <label><input type="checkbox" name="label_${l.id}" ${checked}>${l.name}</label>
     </div>
     % endfor
 </div>

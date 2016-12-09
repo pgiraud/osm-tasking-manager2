@@ -17,3 +17,9 @@
     % endif
   </small>
 </%def>
+
+<%def name="display_project_labels(project)">
+  % for label in project.labels:
+    <span class="label label-default">${label.name}</span>
+  % endfor
+</%def>

@@ -100,18 +100,6 @@ sorts = [('priority', 'asc', _('High priority first')),
     % endif
   </div>
   <div class="col-md-6">
-    % if tags:
-      <div class="well well-sm">
-      % for tag in tags:
-        <h3>${tag.name}</h3>
-        <p>
-        % if tag.spotlight_text:
-          ${tag.spotlight_text}
-        % endif
-        </p>
-      % endfor
-      </div>
-    % endif
     ${custom.main_page_right_panel()}
   </div>
 </div>
@@ -178,7 +166,10 @@ sorts = [('priority', 'asc', _('High priority first')),
   </div>
   ${project.short_description | markdown_filter, n}
   <div class="clear"></div>
+  ${helpers.display_project_labels(project=project)}
+  <br>
   ${helpers.display_project_info(project=project)}
+  <br>
 </div>
 </%def>
 

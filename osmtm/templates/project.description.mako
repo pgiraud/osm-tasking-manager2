@@ -19,16 +19,9 @@ from osmtm.mako_filters import markdown_filter
 % endif
 <p>${project.description | markdown_filter, n}</p>
 <p>
-  ${helpers.display_project_info(project=project)}
-</p>
-<p>
-  % if len(project.tags) is not 0:
-    <small class="text-muted">${_('Project tags:')}
-    % for tag in project.tags:
-      <span class="label label-tag">${tag.name}</span>
-    % endfor
-    </small>
-  % endif
+${helpers.display_project_labels(project=project)}
+<br>
+${helpers.display_project_info(project=project)}
 </p>
 <p class="text-center">
   <a class="btn btn-success btn-lg instructions">
