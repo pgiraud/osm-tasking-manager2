@@ -20,6 +20,6 @@
 
 <%def name="display_project_labels(project)">
   % for label in project.labels:
-    <span class="label label-default">${label.name}</span>
+  <a class="label label-default" href="${request.route_url('home', _query={'search': 'label:' + label.name})}">${label.name}</a>
   % endfor
 </%def>

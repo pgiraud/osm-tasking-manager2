@@ -6482,8 +6482,8 @@ h1 {
   background: url(../img/closed_back.gif) transparent;
   border-color: #efefef;
 }
-#home .archived a,
-#home .draft a {
+#home .archived h4 a,
+#home .draft h4 a {
   color: grey;
 }
 #home ul.project-stats {
