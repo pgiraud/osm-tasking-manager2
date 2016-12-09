@@ -7,12 +7,19 @@
 <div class="container group wrap">
     <div class="row">
         <div class="col-md-6">
-            <ul>
+            <ul class="list-unstyled list-underline">
               % for label in labels:
-              <li>
-                  <button class="btn btn-default">
-                    ${label.name}
-                  </button>
+              <li class="clear">
+                  <%
+                    import re
+                    label_id = label.name
+                    if re.findall(ur'\s', label_id):
+                      label_id = '\"' + label_id + '\"'
+                  %>
+                  <a class="btn btn-default"
+                     href="${request.route_url('home', _query={'search': 'label:' + label_id})}">
+                     ${label.name}
+                  </a>
                   <a href="${request.route_path('label_edit', label=label.id)}" class="btn pull-right">${_('edit')}</a><br />
               </li>
               % endfor

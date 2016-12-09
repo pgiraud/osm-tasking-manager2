@@ -583,3 +583,14 @@ h1 {
 .popover.unread .popover-content {
   white-space: nowrap;
 }
+
+.list-underline {
+  > li:first-child {
+    border-top: 1px solid #dfdfdf;
+  }
+  > li {
+    padding-top: @padding-small-vertical;
+    padding-bottom: @padding-small-vertical;
+    border-bottom: 1px solid #dfdfdf;
+  }
+}

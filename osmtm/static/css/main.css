@@ -6947,3 +6947,11 @@ h1 {
 .popover.unread .popover-content {
   white-space: nowrap;
 }
+.list-underline > li:first-child {
+  border-top: 1px solid #dfdfdf;
+}
+.list-underline > li {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #dfdfdf;
+}

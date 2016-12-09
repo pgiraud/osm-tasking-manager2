@@ -7,16 +7,16 @@
 <div class="container group wrap">
     <div class="row">
         <div class="col-md-6">
-            <ul>
+            <ul class="list-unstyled list-underline">
             % for license in licenses:
-            <li><h4>${license.name}</h4>
+            <li>
+                <a href="${request.route_path('license_edit', license=license.id)}" class="btn pull-right">${_('edit')}</a>
+                <h4>${license.name}</h4>
                 <div class="help-inline">
                   ${license.plain_text}
                 </div>
-                <a href="${request.route_path('license_edit', license=license.id)}" class="btn pull-right">${_('edit')}</a><br />
-                </li>
+            </li>
             % endfor
-            </ul>
             </ul>
         </div>
         <div class="col-md-6">
