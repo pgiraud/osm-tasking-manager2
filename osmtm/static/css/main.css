@@ -6480,7 +6480,6 @@ h1 {
 #home .archived,
 #home .draft {
   background: url(../img/closed_back.gif) transparent;
-  border-color: #efefef;
 }
 #home .archived h4 a,
 #home .draft h4 a {
@@ -6954,4 +6953,10 @@ h1 {
   padding-top: 5px;
   padding-bottom: 5px;
   border-bottom: 1px solid #dfdfdf;
+}
+.panel-heading .navbar {
+  margin-bottom: 0;
+}
+.panel-heading-no-padding {
+  padding: 0;
 }

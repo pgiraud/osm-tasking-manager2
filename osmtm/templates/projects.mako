@@ -9,99 +9,61 @@
 <%
 base_url = request.route_path('home')
 priorities = [_('urgent'), _('high'), _('medium'), _('low')]
-
-sorts = [('priority', 'asc', _('High priority first')),
-         ('created', 'desc', _('Creation date')),
-         ('last_update', 'desc', _('Last update'))]
+%>
+<%
+  total = ngettext('${total} project', '${total} projects', paginator.item_count, mapping={'total': paginator.item_count})
 %>
 
+<form role="form"
+      action="${request.current_route_url()}"
+      method="GET">
+  <input type="hidden" name="sort_by"
+         value="${request.params.get('sort_by', 'priority')}">
+  <input type="hidden" name="direction"
+         value="${request.params.get('direction', 'asc')}">
+
 <div class="container">
-  <div class="col-md-9">
-    <h3>${_('Projects')}</h3>
-    <%
-        qs = dict(request.GET)
-
-        sort_by = qs.get('sort_by', 'priority')
-        direction = qs.get('direction', 'asc')
-        button_text = ''
-        for sort in sorts:
-            if sort[0] == sort_by and sort[1] == direction:
-                button_text = sort[2]
-        endfor
-    %>
-    <form class="form-inline" role="form"
-          action="${request.current_route_url()}"
-          method="GET">
-
+  <div class="row">
+    <div class="col-md-9">
+      <h3>${_('Projects')}</h3>
       <div class="row">
         <div class="col-md-12">
-          <input type="hidden" name="sort_by"
-                 value="${request.params.get('sort_by', 'priority')}">
-          <input type="hidden" name="direction"
-                 value="${request.params.get('direction', 'asc')}">
-
           <div class="form-group left-inner-addon">
             <i class="glyphicon glyphicon-search text-muted"></i>
             <input type="search" class="form-control input-sm"
                    name="search" placeholder="${_('Search')}"
                    value="${request.params.get('search', '')}">
           </div>
-          <div class="btn-group pull-right">
-            <button type="button" class="btn btn-default btn-sm dropdown-toggle"
-                    data-toggle="dropdown">
-              ${_('Sort by:')} <strong>${button_text}</strong>
-              <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" role="menu">
-              % for sort in sorts:
-                <%
-                  qs['sort_by'] = sort[0]
-                  qs['direction'] = sort[1]
-                %>
-                <li>
-                  <a href="${request.current_route_url(_query=qs.items())}">
-                    ${sort[2]}
-                  </a>
-                </li>
-              % endfor
-            </ul>
-          </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-md-12">
-          % if user and user.username:
-          <div class="checkbox input-sm pull-right">
-            <label>
-              <input type="checkbox" name="my_projects"
-                ${'checked' if request.params.get('my_projects') == 'on' else ''}
-                onclick="this.form.submit();"> ${_('Your projects')}
-            </label>
-          </div>
-            % if user.is_admin or user.is_project_manager:
-            <div class="checkbox input-sm pull-right">
-              <label>
-                <input type="checkbox" name="show_archived"
-                  ${'checked' if request.params.get('show_archived') == 'on' else ''}
-                  onclick="this.form.submit();"> ${_('Include archived projects')}
-              </label>
+      <div class="panel panel-default">
+        <div class="panel-heading panel-heading-no-padding">
+          <div class="navbar">
+            <strong class="navbar-text">
+              ${total}
+            </strong>
+            <div class="navbar-right navbar-form">
+              ${my_projects()}
+              ${archived_projects()}
+              ${sort_filter()}
+              &nbsp;
             </div>
-            % endif
-          % else:
-          <br>
-          % endif
+          </div>
         </div>
+        <ul class="list-group">
+        % if paginator.items:
+            % for project in paginator.items:
+              ${project_block(project=project, base_url=base_url,
+                              priorities=priorities)}
+            % endfor
+        % endif
+        </ul>
       </div>
-    </form>
-    % if paginator.items:
-        % for project in paginator.items:
-          ${project_block(project=project, base_url=base_url,
-                          priorities=priorities)}
-        % endfor
-        ${paginate()}
-    % endif
+      ${paginate()}
+    </div>
   </div>
 </div>
+</form>
 </%block>
 
 <%def name="project_block(project, base_url, priorities)">
@@ -118,7 +80,7 @@ sorts = [('priority', 'asc', _('High priority first')),
     else:
         status = ''
 %>
-<div class="project well ${status.lower()}">
+<li class="project list-group-item ${status.lower()}">
   <ul class="nav project-stats">
     <li>
       <table>
@@ -169,7 +131,7 @@ sorts = [('priority', 'asc', _('High priority first')),
   <br>
   ${helpers.display_project_info(project=project)}
   <br>
-</div>
+</li>
 </%def>
 
 <%def name="paginate()">
@@ -183,5 +145,60 @@ sorts = [('priority', 'asc', _('High priority first')),
                       curpage_attr=curpage_attr,
                       dotdot_attr=dotdot_attr)}
   </div>
+</div>
+</%def>
+
+<%def name="my_projects()">
+  % if user and user.username:
+  <div class="checkbox input-sm">
+    <label>
+      <input type="checkbox" name="my_projects"
+        ${'checked' if request.params.get('my_projects') == 'on' else ''}
+        onclick="this.form.submit();"> ${_('Your projects')}
+    </label>
+  </div>
+  % endif
+</%def>
+
+<%def name="archived_projects()">
+  % if user and user.username:
+    % if user.is_admin or user.is_project_manager:
+    <div class="checkbox input-sm">
+      <label>
+        <input type="checkbox" name="show_archived"
+          ${'checked' if request.params.get('show_archived') == 'on' else ''}
+          onclick="this.form.submit();"> ${_('Include archived projects')}
+      </label>
+    </div>
+    % endif
+  % endif
+</%def>
+
+<%def name="sort_filter()">
+<%
+qs = dict(request.GET)
+sorts = [('priority', 'asc', _('High priority first')),
+         ('created', 'desc', _('Creation date')),
+         ('last_update', 'desc', _('Last update'))]
+%>
+<div class="btn-group">
+  <button type="button" class="btn btn-default btn-sm dropdown-toggle"
+          data-toggle="dropdown">
+    ${_('Sort')}
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" role="menu">
+    % for sort in sorts:
+    <%
+    qs['sort_by'] = sort[0]
+    qs['direction'] = sort[1]
+    %>
+    <li>
+      <a href="${request.current_route_url(_query=qs.items())}">
+        ${sort[2]}
+      </a>
+    </li>
+    % endfor
+  </ul>
 </div>
 </%def>
