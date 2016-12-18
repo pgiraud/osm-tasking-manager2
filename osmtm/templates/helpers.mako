@@ -26,6 +26,8 @@
       if re.findall(ur'\s', label_id):
         label_id = '\"' + label_id + '\"'
     %>
-  <a class="label label-default" href="${request.route_url('home', _query={'search': 'label:' + label_id})}">${label.name}</a>
+  <a class="label label-default"
+     style="background-color: ${label.color}; color:white;"
+     href="${request.route_url('home', _query={'search': 'label:' + label_id})}">${label.name}</a>
   % endfor
 </%def>

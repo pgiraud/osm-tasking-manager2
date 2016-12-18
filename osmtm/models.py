@@ -721,6 +721,7 @@ class Label(Base):
     __tablename__ = 'label'
     id = Column(Integer, primary_key=True)
     name = Column(Unicode, nullable=False)
+    color = Column(Unicode)
     projects = relationship("Project", secondary=project_labels_table)
 
     def __init__(self):

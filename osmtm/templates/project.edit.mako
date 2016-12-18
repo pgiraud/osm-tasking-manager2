@@ -466,7 +466,13 @@ geometry = loads(str(project.area.geometry.data))
       checked = "checked"
     %>
     <div class="checkbox">
-        <label><input type="checkbox" name="label_${l.id}" ${checked}>${l.name}</label>
+        <label>
+          <input type="checkbox" name="label_${l.id}" ${checked}>
+          <span class="label"
+                style="background-color: ${l.color}; color:white;">
+            ${l.name}
+          </span>
+        </label>
     </div>
     % endfor
 </div>

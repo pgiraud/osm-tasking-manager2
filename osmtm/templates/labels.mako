@@ -17,6 +17,7 @@
                       label_id = '\"' + label_id + '\"'
                   %>
                   <a class="btn btn-default"
+                     style="background-color: ${label.color}; color:white;"
                      href="${request.route_url('home', _query={'search': 'label:' + label_id})}">
                      ${label.name}
                   </a>
