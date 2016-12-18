@@ -49,11 +49,13 @@ def label_edit(request):
         if not label:
             label = Label()
             label.name = request.params['name']
+            label.color = request.params['color']
             DBSession.add(label)
             DBSession.flush()
             request.session.flash(_('Project label created!'), 'success')
         else:
             label.name = request.params['name']
+            label.color = request.params['color']
             request.session.flash(_('Project label updated!'), 'success')
 
         DBSession.add(label)

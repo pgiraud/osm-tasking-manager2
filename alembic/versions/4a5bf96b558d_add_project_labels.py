@@ -18,7 +18,8 @@ def upgrade():
     op.create_table(
         'label',
         sa.Column('id', sa.Integer, primary_key=True),
-        sa.Column('name', sa.Unicode)
+        sa.Column('name', sa.Unicode),
+        sa.Column('color', sa.Unicode),
     )
 
 

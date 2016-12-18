@@ -43,6 +43,8 @@ comments = []
         var unreadMsgsI18n = "${_('You have unread messages')}";
     </script>
 
+    <%block name="extrascripts"></%block>
+
   </head>
   <body id="${page_id}">
     <div class="navbar navbar-default navbar-fixed-top">

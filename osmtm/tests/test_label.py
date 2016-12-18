@@ -26,7 +26,8 @@ class TestLabelFunctional(BaseTestCase):
         self.testapp.post('/label/new', headers=headers,
                           params={
                               'form.submitted': True,
-                              'name': 'Name'
+                              'name': 'Name',
+                              'color': '#ff0000',
                           },
                           status=302)
 
@@ -57,7 +58,8 @@ class TestLabelFunctional(BaseTestCase):
         self.testapp.post('/label/%s/edit' % label_id, headers=headers,
                           params={
                               'form.submitted': True,
-                              'name': 'changed_name'
+                              'name': 'changed_name',
+                              'color': '#ff0000',
                           },
                           status=302)
 
