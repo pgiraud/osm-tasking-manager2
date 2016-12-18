@@ -18,7 +18,7 @@
                   %>
                   <a class="btn btn-default"
                      style="background-color: ${label.color}; color:white;"
-                     href="${request.route_url('home', _query={'search': 'label:' + label_id})}">
+                     href="${request.route_url('projects', _query={'search': 'label:' + label_id})}">
                      ${label.name}
                   </a>
                   <a href="${request.route_path('label_edit', label=label.id)}" class="btn pull-right">${_('edit')}</a><br />

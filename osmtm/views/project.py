@@ -5,6 +5,7 @@ from pyramid.response import Response
 from ..models import (
     DBSession,
     Project,
+    ProjectTranslation,
     Area,
     PriorityArea,
     User,
@@ -19,6 +20,15 @@ from pyramid.security import authenticated_userid
 from pyramid.i18n import (
     get_locale_name,
 )
+
+import re
+import sqlalchemy
+from sqlalchemy import (
+    desc,
+    or_,
+    and_,
+)
+
 from sqlalchemy.orm import (
     joinedload,
 )
@@ -59,8 +69,134 @@ from ..utils import (
 
 from user import username_to_userid
 
+from webhelpers.paginate import (
+    PageURL_WebOb,
+    Page
+)
+
 import logging
 log = logging.getLogger(__name__)
+
+
+@view_config(route_name="projects", renderer='projects.mako', http_cache=0)
+def projects(request):
+    check_project_expiration()
+    paginator = get_projects(request, 10)
+    return dict(page_id="home", paginator=paginator)
+
+
+@view_config(route_name='projects_json', renderer='json')
+def projects_json(request):
+    if not request.is_xhr:
+        request.response.content_disposition = \
+            'attachment; filename="hot_osmtm.json"'
+    paginator = get_projects(request, 100)
+    request.response.headerlist.append(('Access-Control-Allow-Origin', '*'))
+    return FeatureCollection([project.to_feature() for project in paginator])
+
+
+def get_projects(request, items_per_page):
+    query = DBSession.query(Project) \
+        .options(joinedload(Project.translations['en'])) \
+        .options(joinedload(Project.translations[request.locale_name])) \
+        .options(joinedload(Project.author)) \
+        .options(joinedload(Project.area))
+
+    user_id = authenticated_userid(request)
+    user = None
+    if user_id is not None:
+        user = DBSession.query(User).get(user_id)
+
+    if not user:
+        filter = Project.private == False  # noqa
+    elif not user.is_admin and not user.is_project_manager:
+        query = query.outerjoin(Project.allowed_users)
+        filter = or_(Project.private == False,  # noqa
+                     User.id == user_id)
+    else:
+        filter = True  # make it work with an and_ filter
+
+    if not user or (not user.is_admin and not user.is_project_manager):
+        filter = and_(Project.status == Project.status_published, filter)
+
+    if 'search' in request.params:
+        s = request.params.get('search')
+        PT = ProjectTranslation
+
+        '''This pulls out search strings with "label:" from the query
+           and searches for project labels that match those strings.'''
+        label_regex = r"label:(\"([^\"]+)\"|'([^']+)'|(\S+))\s*"
+        matches = re.finditer(label_regex, s)
+
+        labels = []
+        for num, match in enumerate(matches):
+            '''We don't want the first group of the match since it's the full
+               text'''
+            labels.append([g for g in match.groups()[1::] if g is not None][0])
+
+        if len(labels) > 0:
+            ids = DBSession.query(Project.id) \
+                      .filter(and_(*[Project.labels.any(name=label)
+                                     for label in labels])).all()
+            filter = and_(Project.id.in_(ids), filter)
+
+        '''Remove any label from the search strings and move on to the next
+           search criteria'''
+        s = re.sub(label_regex, '', s).strip()
+
+        if s != '':
+            search_filter = or_(PT.name.ilike('%%%s%%' % s),
+                                PT.short_description.ilike('%%%s%%' % s),
+                                PT.description.ilike('%%%s%%' % s),)
+
+            '''The below code extracts all the numerals in the
+               search string as a list, if there are some it
+               joins that list of number characters into a string,
+               casts it as an integer and searchs to see if there
+               is a project with that id. If there is, it adds
+               it to the search results.'''
+            digits = re.findall('\d+', s)
+            if digits:
+                search_filter = or_(
+                    ProjectTranslation.id == (int(''.join(digits))),
+                    search_filter)
+            ids = DBSession.query(ProjectTranslation.id) \
+                           .filter(search_filter) \
+                           .all()
+            filter = and_(Project.id.in_(ids), filter)
+
+    else:
+        labels = None
+
+    # filter projects on which the current user worked on
+    if request.params.get('my_projects', '') == 'on':
+        ids = DBSession.query(TaskLock.project_id) \
+                       .filter(TaskLock.user_id == user_id) \
+                       .all()
+
+        if len(ids) > 0:
+            filter = and_(Project.id.in_(ids), filter)
+        else:
+            # IN-predicate  with emty sequence can be expensive
+            filter = and_(False == True)  # noqa
+
+    if (request.params.get('show_archived', '') != 'on'):
+        filter = and_(Project.status != Project.status_archived, filter)
+
+    sort_by = 'project.%s' % request.params.get('sort_by', 'priority')
+    direction = request.params.get('direction', 'asc')
+    direction_func = getattr(sqlalchemy, direction, None)
+    sort_by = direction_func(sort_by)
+
+    query = query.order_by(sort_by, desc(Project.id))
+
+    query = query.filter(filter)
+
+    page = int(request.params.get('page', 1))
+    page_url = PageURL_WebOb(request)
+    paginator = Page(query, page, url=page_url, items_per_page=items_per_page)
+
+    return paginator
 
 
 @view_config(route_name='project', renderer='project.mako', http_cache=0,

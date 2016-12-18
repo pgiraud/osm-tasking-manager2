@@ -60,11 +60,12 @@ def main(global_config, **settings):
 
     config.add_static_view('static', 'static', cachebust=True)
     config.add_route('home', '/')
-    config.add_route('home_json', '/projects.json')
     config.add_route('about', '/about')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
     config.add_route('oauth_callback', '/oauth_callback')
+    config.add_route('projects', '/projects')
+    config.add_route('projects_json', '/projects.json')
     config.add_route('project_new', '/project/new')
     config.add_route('project_new_grid', '/project/new/grid')
     config.add_route('project_new_arbitrary', '/project/new/arbitrary')

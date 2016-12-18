@@ -643,7 +643,7 @@ class TestProjectFunctional(BaseTestCase):
                          status=403,
                          headers=headers_user1)
 
-    def test_home__private_not_allowed(self):
+    def test_projects__private_not_allowed(self):
         import transaction
         from . import USER1_ID
         from osmtm.models import User, Project, DBSession
@@ -656,23 +656,23 @@ class TestProjectFunctional(BaseTestCase):
         DBSession.flush()
         transaction.commit()
 
-        res = self.testapp.get('/', status=200)
+        res = self.testapp.get('/projects', status=200)
         self.assertFalse("private_project" in res.body)
 
-        res = self.testapp.get('/', status=200,
+        res = self.testapp.get('/projects', status=200,
                                params={
                                    'search': 'private'
                                })
         self.assertFalse("private_project" in res.body)
 
-        res = self.testapp.get('/', status=200,
+        res = self.testapp.get('/projects', status=200,
                                params={
                                    'search': project_id
                                })
         self.assertFalse("private_project" in res.body)
 
         headers_user1 = self.login_as_user1()
-        res = self.testapp.get('/', status=200, headers=headers_user1)
+        res = self.testapp.get('/projects', status=200, headers=headers_user1)
         self.assertFalse("private_project" in res.body)
 
         user1 = DBSession.query(User).get(USER1_ID)
@@ -683,10 +683,10 @@ class TestProjectFunctional(BaseTestCase):
         DBSession.flush()
         transaction.commit()
 
-        res = self.testapp.get('/', status=200, headers=headers_user1)
+        res = self.testapp.get('/projects', status=200, headers=headers_user1)
         self.assertTrue("private_project" in res.body)
 
-    def test_home__my_projects(self):
+    def test_projects__my_projects(self):
         import transaction
         from osmtm.models import Project, DBSession
         project_id = self.create_project()
@@ -700,10 +700,10 @@ class TestProjectFunctional(BaseTestCase):
         transaction.commit()
 
         headers = self.login_as_user1()
-        res = self.testapp.get('/', status=200, headers=headers)
+        res = self.testapp.get('/projects', status=200, headers=headers)
         self.assertTrue(name in res.body)
 
-        res = self.testapp.get('/', status=200, headers=headers,
+        res = self.testapp.get('/projects', status=200, headers=headers,
                                params={
                                    'my_projects': 'on'
                                })
@@ -713,7 +713,7 @@ class TestProjectFunctional(BaseTestCase):
                          headers=headers,
                          xhr=True)
 
-        res = self.testapp.get('/', status=200, headers=headers,
+        res = self.testapp.get('/projects', status=200, headers=headers,
                                params={
                                    'my': 'on'
                                })
@@ -759,7 +759,6 @@ class TestProjectFunctional(BaseTestCase):
         from osmtm.models import Project, DBSession
         project_id = self.create_project()
         project = DBSession.query(Project).get(project_id)
-        project.name = u'private_project'
         project.private = True
         DBSession.add(project)
         DBSession.flush()
@@ -950,3 +949,68 @@ class TestProjectFunctional(BaseTestCase):
         self.assertEqual([msg.message for msg in msg_to_user2],
                          ['Please help us with this! \
                          Por favor, nos ayude con esto!'])
+
+    def test_projects__search(self):
+        res = self.testapp.get('/projects', status=200,
+                               params={
+                                   'search': 'lorem'
+                               })
+        projects = res.html.select('.project')
+        self.assertEqual(len(projects), 1)
+
+        res = self.testapp.get('/projects', status=200,
+                               params={
+                                   'search': 'foo'
+                               })
+        projects = res.html.select('.project')
+        self.assertEqual(len(projects), 0)
+
+    def test_projects__search_label(self):
+        res = self.testapp.get('/projects', status=200,
+                               params={
+                                   'search': 'label:foo'
+                               })
+        projects = res.html.select('.project')
+        self.assertEqual(len(projects), 0)
+
+        res = self.testapp.get('/projects', status=200,
+                               params={
+                                   'search': 'label:bar'
+                               })
+        projects = res.html.select('.project')
+        self.assertEqual(len(projects), 1)
+
+        res = self.testapp.get('/projects', status=200,
+                               params={
+                                   'search': 'lorem label:bar'
+                               })
+        projects = res.html.select('.project')
+        self.assertEqual(len(projects), 1)
+
+        res = self.testapp.get('/projects', status=200,
+                               params={
+                                   'search': 'label:bar lorem'
+                               })
+        projects = res.html.select('.project')
+        self.assertEqual(len(projects), 1)
+
+        res = self.testapp.get('/projects', status=200,
+                               params={
+                                   'search': 'label:"dude label"'
+                               })
+        projects = res.html.select('.project')
+        self.assertEqual(len(projects), 1)
+
+        res = self.testapp.get('/projects', status=200,
+                               params={
+                                   'search': 'label:bar label:"dude label"'
+                               })
+        projects = res.html.select('.project')
+        self.assertEqual(len(projects), 1)
+
+        res = self.testapp.get('/projects', status=200,
+                               params={
+                                   'search': 'label:bar label:foo'
+                               })
+        projects = res.html.select('.project')
+        self.assertEqual(len(projects), 0)

@@ -54,6 +54,11 @@ comments = []
             <i class="glyphicon glyphicon-home"></i> ${custom.instance_name()}
           </a>
         </div>
+        <ul class="nav navbar-nav">
+          <li>
+            <a href="${request.route_path('projects')}" class="btn">${_('Projects')}</a>
+          </li>
+        </ul>
         <ul class="nav navbar-nav navbar-right">
           <li>
           <a href="${request.route_path('about')}" class="btn btn-link pull-right">${_('About')}</a>
