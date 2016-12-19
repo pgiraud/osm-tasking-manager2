@@ -45,6 +45,7 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
             <div class="navbar-right navbar-form">
               ${my_projects()}
               ${archived_projects()}
+              ${label_filter()}
               ${sort_filter()}
               &nbsp;
             </div>
@@ -203,6 +204,47 @@ sorts = [('priority', 'asc', _('High priority first')),
           % endif
           ></i>
         ${sort[2]}
+      </a>
+    </li>
+    % endfor
+  </ul>
+</div>
+</%def>
+
+<%def name="label_filter()">
+<div class="btn-group">
+  <button type="button" class="btn btn-default btn-sm dropdown-toggle"
+          data-toggle="dropdown">
+    ${_('Labels')}
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" role="menu">
+    % for label in labels:
+    <%
+    import re
+    qs = dict(request.GET)
+    label_id = label.name
+    if re.findall(ur'\s', label_id):
+      label_id = '\"' + label_id + '\"'
+    label_filter = 'label:%s' % label_id
+    search_filter = qs.get('search', '')
+    found = False
+    if label_filter in search_filter:
+      found = True
+      qs['search'] = qs['search'].replace(label_filter, '')
+    else:
+      qs['search'] = (search_filter + ' ' + label_filter).strip()
+    %>
+    <li>
+      <a href="${request.current_route_url(_query=qs.items())}">
+        <i class="glyphicon glyphicon-ok"
+          % if not found:
+          style="visibility:hidden"
+          % endif
+          ></i>
+        <span class="label" style="background-color: ${label.color}">
+        ${label.name}
+        </span>
       </a>
     </li>
     % endfor

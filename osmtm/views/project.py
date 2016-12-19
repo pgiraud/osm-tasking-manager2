@@ -82,7 +82,9 @@ log = logging.getLogger(__name__)
 def projects(request):
     check_project_expiration()
     paginator = get_projects(request, 10)
-    return dict(page_id="home", paginator=paginator)
+
+    labels = DBSession.query(Label).all()
+    return dict(page_id="home", paginator=paginator, labels=labels)
 
 
 @view_config(route_name='projects_json', renderer='json')
