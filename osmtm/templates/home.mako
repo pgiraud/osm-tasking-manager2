@@ -14,7 +14,6 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
     ${custom.main_page_right_panel()}
   </div>
   <div class="col-md-6">
-    <h2>${_('Projects')}</h2>
     <h3>${_('Projects')}</h3>
     <form role="form"
           action="${request.current_route_url('projects')}"
