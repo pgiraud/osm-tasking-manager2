@@ -9,7 +9,10 @@ from ..models import (
     Label,
 )
 
-from .project import check_project_expiration
+from .project import (
+    check_project_expiration,
+    get_projects,
+)
 
 from pyramid.security import authenticated_userid
 
@@ -24,7 +27,11 @@ def home(request):
         request.override_renderer = 'start.mako'
         return dict(page_id="start")
 
-    return dict(page_id="home")
+    filter = Project.priority == 0
+
+    paginator = get_projects(request, 5, filter=filter)
+
+    return dict(page_id="home", paginator=paginator)
 
 
 @view_config(route_name='about', renderer='about.mako')

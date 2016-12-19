@@ -97,7 +97,7 @@ def projects_json(request):
     return FeatureCollection([project.to_feature() for project in paginator])
 
 
-def get_projects(request, items_per_page):
+def get_projects(request, items_per_page, filter=True):
     query = DBSession.query(Project) \
         .options(joinedload(Project.translations['en'])) \
         .options(joinedload(Project.translations[request.locale_name])) \
@@ -110,13 +110,12 @@ def get_projects(request, items_per_page):
         user = DBSession.query(User).get(user_id)
 
     if not user:
-        filter = Project.private == False  # noqa
+        filter = and_(Project.private == False, filter)  # noqa
     elif not user.is_admin and not user.is_project_manager:
         query = query.outerjoin(Project.allowed_users)
-        filter = or_(Project.private == False,  # noqa
-                     User.id == user_id)
-    else:
-        filter = True  # make it work with an and_ filter
+        filter = and_(or_(Project.private == False,  # noqa
+                          User.id == user_id),
+                      filter)
 
     if not user or (not user.is_admin and not user.is_project_manager):
         filter = and_(Project.status == Project.status_published, filter)
