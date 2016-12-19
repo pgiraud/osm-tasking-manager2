@@ -176,7 +176,6 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
 
 <%def name="sort_filter()">
 <%
-qs = dict(request.GET)
 sorts = [('priority', 'asc', _('High priority first')),
          ('created', 'desc', _('Creation date')),
          ('last_update', 'desc', _('Last update'))]
@@ -190,11 +189,19 @@ sorts = [('priority', 'asc', _('High priority first')),
   <ul class="dropdown-menu" role="menu">
     % for sort in sorts:
     <%
+    qs = dict(request.GET)
+    sort_by = qs.get('sort_by', 'priority')
+    direction = qs.get('direction', 'asc')
     qs['sort_by'] = sort[0]
     qs['direction'] = sort[1]
     %>
     <li>
       <a href="${request.current_route_url(_query=qs.items())}">
+        <i class="glyphicon glyphicon-ok"
+          % if sort[0] != sort_by or sort[1] != direction:
+          style="visibility:hidden"
+          % endif
+          ></i>
         ${sort[2]}
       </a>
     </li>
