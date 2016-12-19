@@ -13,6 +13,16 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
 <%
   total = ngettext('${total} project', '${total} projects', paginator.item_count, mapping={'total': paginator.item_count})
 %>
+<%
+  qs = dict(request.GET)
+  default_sort = qs.get('sort_by', 'priority') == 'priority'
+  default_direction = qs.get('direction', 'asc') == 'asc'
+  default_search = qs.get('search', '') == ''
+  my_projects = qs.get('my_projects')
+  show_archived = qs.get('show_archived')
+  default_filter = default_sort and default_direction and default_search and \
+    not my_projects and not show_archived
+%>
 
 <form role="form"
       action="${request.current_route_url()}"
@@ -30,12 +40,25 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
         <div class="col-md-12">
           <div class="form-group left-inner-addon">
             <i class="glyphicon glyphicon-search text-muted"></i>
-            <input type="search" class="form-control input-sm"
+            <input type="search" class="form-control"
                    name="search" placeholder="${_('Search')}"
                    value="${request.params.get('search', '')}">
           </div>
         </div>
       </div>
+      % if not default_filter:
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <a class="btn btn-link btn-sm"
+               href="${request.route_path('projects')}">
+              <i class="glyphicon glyphicon-remove"></i>
+              ${_('Clear current search query, filters, and sorts')}
+            </a>
+          </div>
+        </div>
+      </div>
+      % endif
       <div class="panel panel-default">
         <div class="panel-heading panel-heading-no-padding">
           <div class="navbar">
@@ -43,8 +66,8 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
               ${total}
             </strong>
             <div class="navbar-right navbar-form">
-              ${my_projects()}
-              ${archived_projects()}
+              ${my_projects_filter()}
+              ${archived_projects_filter()}
               ${label_filter()}
               ${sort_filter()}
               &nbsp;
@@ -149,7 +172,7 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
 </div>
 </%def>
 
-<%def name="my_projects()">
+<%def name="my_projects_filter()">
   % if user and user.username:
   <div class="checkbox input-sm">
     <label>
@@ -161,7 +184,7 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
   % endif
 </%def>
 
-<%def name="archived_projects()">
+<%def name="archived_projects_filter()">
   % if user and user.username:
     % if user.is_admin or user.is_project_manager:
     <div class="checkbox input-sm">
