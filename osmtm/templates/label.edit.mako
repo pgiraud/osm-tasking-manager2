@@ -12,7 +12,7 @@
         </div>
         <div class="form-group">
           <select class="colorselector" name="color">
-            % for color in [u'#b60205', u'#d93f0b', u'#fbca04', u'#0e8a16', '#006b75', '#1d76db', '#0052cc', '#5319e7']:
+            % for color in [u'#888', u'#b60205', u'#d93f0b', u'#fbca04', u'#0e8a16', '#006b75', '#1d76db', '#0052cc', '#5319e7']:
               <option value="${color}"
                       data-color="${color}"
                       ${'selected' if label is not None and label.color == color else ''}>
