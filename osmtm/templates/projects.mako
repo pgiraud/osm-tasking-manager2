@@ -66,8 +66,7 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
               ${total}
             </strong>
             <div class="navbar-right navbar-form">
-              ${my_projects_filter()}
-              ${archived_projects_filter()}
+              ${other_filters()}
               ${label_filter()}
               ${sort_filter()}
               &nbsp;
@@ -172,30 +171,56 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
 </div>
 </%def>
 
-<%def name="my_projects_filter()">
-  % if user and user.username:
-  <div class="checkbox input-sm">
-    <label>
-      <input type="checkbox" name="my_projects"
-        ${'checked' if request.params.get('my_projects') == 'on' else ''}
-        onclick="this.form.submit();"> ${_('Your projects')}
-    </label>
-  </div>
-  % endif
-</%def>
-
-<%def name="archived_projects_filter()">
-  % if user and user.username:
+<%def name="other_filters()">
+% if user and user.username:
+<div class="btn-group">
+  <button type="button" class="btn btn-default btn-sm dropdown-toggle"
+          data-toggle="dropdown">
+    ${_('Filters')}
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <%
+      qs = dict(request.GET)
+      checked = 'my_projects' in qs
+      if not checked:
+        qs['my_projects'] = 'on'
+      else:
+        qs.pop('my_projects', None)
+      %>
+      <a href="${request.current_route_url(_query=qs.items())}">
+        <i class="glyphicon glyphicon-ok"
+          % if not checked:
+          style="visibility:hidden"
+          % endif
+          ></i>
+        ${_('Your projects')}
+      </a>
+    </li>
     % if user.is_admin or user.is_project_manager:
-    <div class="checkbox input-sm">
-      <label>
-        <input type="checkbox" name="show_archived"
-          ${'checked' if request.params.get('show_archived') == 'on' else ''}
-          onclick="this.form.submit();"> ${_('Include archived projects')}
-      </label>
-    </div>
+    <li>
+      <%
+      qs = dict(request.GET)
+      checked = 'show_archived' in qs
+      if not checked:
+        qs['show_archived'] = 'on'
+      else:
+        qs.pop('show_archived', None)
+      %>
+      <a href="${request.current_route_url(_query=qs.items())}">
+        <i class="glyphicon glyphicon-ok"
+          % if not checked:
+          style="visibility:hidden"
+          % endif
+          ></i>
+        ${_('Include archived projects')}
+      </a>
+    </li>
     % endif
-  % endif
+  </ul>
+</div>
+% endif
 </%def>
 
 <%def name="sort_filter()">
