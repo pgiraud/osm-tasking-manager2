@@ -34,7 +34,7 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
 
 <div class="container">
   <div class="row">
-    <div class="col-md-9">
+    <div class="col-md-8">
       <h3>${_('Projects')}</h3>
       <div class="row">
         <div class="col-md-12">
@@ -83,6 +83,29 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
         </ul>
       </div>
       ${paginate()}
+    </div>
+    <div class="col-md-4">
+      % for label in labels:
+        <%
+          if request.locale_name:
+            label.locale = request.locale_name
+        %>
+        % if label.name in search['labels'] and label.description:
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">
+              <span class="label"
+                style="background-color:${label.color}">
+                ${label.name}
+              </span>
+              </h3>
+            </div>
+            <div class="panel-body">
+              ${label.description}
+            </div>
+          </div>
+        % endif
+      % endfor
     </div>
   </div>
 </div>

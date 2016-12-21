@@ -724,6 +724,8 @@ class Label(Base, Translatable):
     color = Column(Unicode)
     projects = relationship("Project", secondary=project_labels_table)
 
+    locale = 'en'
+
     def __init__(self):
         pass
 
