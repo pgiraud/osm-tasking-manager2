@@ -139,7 +139,11 @@ def get_projects(request, items_per_page, filter=True):
             ids = DBSession.query(Project.id) \
                       .filter(and_(*[Project.labels.any(name=label)
                                      for label in labels])).all()
-            filter = and_(Project.id.in_(ids), filter)
+            if len(ids) > 0:
+                filter = and_(Project.id.in_(ids), filter)
+            else:
+                # IN-predicate  with emty sequence can be expensive
+                filter = and_(False == True, filter)  # noqa
 
         '''Remove any label from the search strings and move on to the next
            search criteria'''
@@ -164,7 +168,11 @@ def get_projects(request, items_per_page, filter=True):
             ids = DBSession.query(ProjectTranslation.id) \
                            .filter(search_filter) \
                            .all()
-            filter = and_(Project.id.in_(ids), filter)
+            if len(ids) > 0:
+                filter = and_(Project.id.in_(ids), filter)
+            else:
+                # IN-predicate  with emty sequence can be expensive
+                filter = and_(False == True, filter)  # noqa
 
     else:
         labels = None
