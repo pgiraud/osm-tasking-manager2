@@ -94,7 +94,9 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
     </a>
   </h4>
   <div>
-    ${helpers.display_project_labels(project=project)}
+  % for label in project.labels:
+  ${helpers.display_label(label)}
+  % endfor
   </div>
   <div>
   ${helpers.display_project_info(project=project)}

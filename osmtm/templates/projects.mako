@@ -94,9 +94,7 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
           <div class="panel panel-default">
             <div class="panel-heading">
               <h3 class="panel-title">
-              <span class="label"
-                style="background-color:${label.color}">
-                ${label.name}
+                ${helpers.display_label(label)}
               </span>
               </h3>
             </div>
@@ -173,7 +171,9 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
   </div>
   ${project.short_description | markdown_filter, n}
   <div class="clear"></div>
-  ${helpers.display_project_labels(project=project)}
+  % for label in project.labels:
+  ${helpers.display_label(label)}
+  % endfor
   <br>
   ${helpers.display_project_info(project=project)}
   <br>
@@ -283,6 +283,9 @@ sorts = [('priority', 'asc', _('High priority first')),
 </%def>
 
 <%def name="label_filter()">
+<%
+  from osmtm.mako_filters import contrast
+%>
 <div class="btn-group">
   <button type="button" class="btn btn-default btn-sm dropdown-toggle"
           data-toggle="dropdown">
@@ -313,7 +316,7 @@ sorts = [('priority', 'asc', _('High priority first')),
           style="visibility:hidden"
           % endif
           ></i>
-        <span class="label" style="background-color: ${label.color}">
+        <span class="label" style="background-color: ${label.color}; color: ${label.color|contrast}">
         ${label.name}
         </span>
       </a>

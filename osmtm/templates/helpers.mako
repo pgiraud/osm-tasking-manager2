@@ -18,18 +18,19 @@
   </small>
 </%def>
 
-<%def name="display_project_labels(project)">
-  % for label in project.labels:
-    <%
-      import re
-      label_id = label.name
-      if re.findall(ur'\s', label_id):
-        label_id = '\"' + label_id + '\"'
-    %>
+<%def name="display_label(label)">
+  <%
+    from osmtm.mako_filters import contrast
+  %>
+  <%
+    import re
+    label_id = label.name
+    if re.findall(ur'\s', label_id):
+      label_id = '\"' + label_id + '\"'
+  %>
   <a class="label label-default"
-     style="background-color: ${label.color};"
+     style="background-color: ${label.color};color: ${label.color|contrast}"
      href="${request.route_url('projects', _query={'search': 'label:' + label_id})}">${label.name}</a>
-  % endfor
 </%def>
 
 <%def name="locale_chooser(inputname)">

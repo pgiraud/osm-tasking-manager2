@@ -19,7 +19,9 @@ from osmtm.mako_filters import markdown_filter
 % endif
 <p>${project.description | markdown_filter, n}</p>
 <p>
-${helpers.display_project_labels(project=project)}
+% for label in project.labels:
+${helpers.display_label(label)}
+% endfor
 <br>
 ${helpers.display_project_info(project=project)}
 </p>
