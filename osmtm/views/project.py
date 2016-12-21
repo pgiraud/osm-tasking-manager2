@@ -81,10 +81,12 @@ log = logging.getLogger(__name__)
 @view_config(route_name="projects", renderer='projects.mako', http_cache=0)
 def projects(request):
     check_project_expiration()
-    paginator = get_projects(request, 10)
+    search = parse_search(request.params.get('search', ''))
+    paginator = get_projects(request, 10, search=search)
 
     labels = DBSession.query(Label).all()
-    return dict(page_id="home", paginator=paginator, labels=labels)
+    return dict(page_id="home", paginator=paginator, labels=labels,
+                search=search)
 
 
 @view_config(route_name='projects_json', renderer='json')
@@ -97,7 +99,30 @@ def projects_json(request):
     return FeatureCollection([project.to_feature() for project in paginator])
 
 
-def get_projects(request, items_per_page, filter=True):
+def parse_search(s):
+
+    '''This pulls out search strings with "label:" from the query
+       and searches for project labels that match those strings.'''
+    label_regex = r"label:(\"([^\"]+)\"|'([^']+)'|(\S+))\s*"
+    matches = re.finditer(label_regex, s)
+
+    labels = []
+    for num, match in enumerate(matches):
+        '''We don't want the first group of the match since it's the full
+           text'''
+        labels.append([g for g in match.groups()[1::] if g is not None][0])
+
+    '''Remove any label from the search strings and move on to the next
+       search criteria'''
+    s = re.sub(label_regex, '', s).strip()
+
+    return {
+        'labels': labels,
+        'remaining': s
+    }
+
+
+def get_projects(request, items_per_page, filter=True, search=None):
     query = DBSession.query(Project) \
         .options(joinedload(Project.translations['en'])) \
         .options(joinedload(Project.translations[request.locale_name])) \
@@ -120,21 +145,8 @@ def get_projects(request, items_per_page, filter=True):
     if not user or (not user.is_admin and not user.is_project_manager):
         filter = and_(Project.status == Project.status_published, filter)
 
-    if 'search' in request.params:
-        s = request.params.get('search')
-        PT = ProjectTranslation
-
-        '''This pulls out search strings with "label:" from the query
-           and searches for project labels that match those strings.'''
-        label_regex = r"label:(\"([^\"]+)\"|'([^']+)'|(\S+))\s*"
-        matches = re.finditer(label_regex, s)
-
-        labels = []
-        for num, match in enumerate(matches):
-            '''We don't want the first group of the match since it's the full
-               text'''
-            labels.append([g for g in match.groups()[1::] if g is not None][0])
-
+    if search and search['labels']:
+        labels = search['labels']
         if len(labels) > 0:
             ids = DBSession.query(Project.id) \
                       .filter(and_(*[Project.labels.any(name=label)
@@ -145,37 +157,34 @@ def get_projects(request, items_per_page, filter=True):
                 # IN-predicate  with emty sequence can be expensive
                 filter = and_(False == True, filter)  # noqa
 
-        '''Remove any label from the search strings and move on to the next
-           search criteria'''
-        s = re.sub(label_regex, '', s).strip()
+    if search and search['remaining'] and search['remaining'] != '':
 
-        if s != '':
-            search_filter = or_(PT.name.ilike('%%%s%%' % s),
-                                PT.short_description.ilike('%%%s%%' % s),
-                                PT.description.ilike('%%%s%%' % s),)
+        s = search['remaining']
+        PT = ProjectTranslation
 
-            '''The below code extracts all the numerals in the
-               search string as a list, if there are some it
-               joins that list of number characters into a string,
-               casts it as an integer and searchs to see if there
-               is a project with that id. If there is, it adds
-               it to the search results.'''
-            digits = re.findall('\d+', s)
-            if digits:
-                search_filter = or_(
-                    ProjectTranslation.id == (int(''.join(digits))),
-                    search_filter)
-            ids = DBSession.query(ProjectTranslation.id) \
-                           .filter(search_filter) \
-                           .all()
-            if len(ids) > 0:
-                filter = and_(Project.id.in_(ids), filter)
-            else:
-                # IN-predicate  with emty sequence can be expensive
-                filter = and_(False == True, filter)  # noqa
+        search_filter = or_(PT.name.ilike('%%%s%%' % s),
+                            PT.short_description.ilike('%%%s%%' % s),
+                            PT.description.ilike('%%%s%%' % s),)
 
-    else:
-        labels = None
+        '''The below code extracts all the numerals in the
+           search string as a list, if there are some it
+           joins that list of number characters into a string,
+           casts it as an integer and searchs to see if there
+           is a project with that id. If there is, it adds
+           it to the search results.'''
+        digits = re.findall('\d+', s)
+        if digits:
+            search_filter = or_(
+                ProjectTranslation.id == (int(''.join(digits))),
+                search_filter)
+        ids = DBSession.query(ProjectTranslation.id) \
+                       .filter(search_filter) \
+                       .all()
+        if len(ids) > 0:
+            filter = and_(Project.id.in_(ids), filter)
+        else:
+            # IN-predicate  with emty sequence can be expensive
+            filter = and_(False == True, filter)  # noqa
 
     # filter projects on which the current user worked on
     if request.params.get('my_projects', '') == 'on':
