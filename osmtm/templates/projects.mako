@@ -252,18 +252,26 @@ sorts = [('priority', 'asc', _('High priority first')),
          ('created', 'desc', _('Creation date')),
          ('last_update', 'desc', _('Last update'))]
 %>
+<%
+  qs = dict(request.GET)
+  sort_by = qs.get('sort_by', 'priority')
+  direction = qs.get('direction', 'asc')
+  button_text = ''
+  for sort in sorts:
+      if sort[0] == sort_by and sort[1] == direction:
+          button_text = sort[2]
+  endfor
+%>
 <div class="btn-group">
   <button type="button" class="btn btn-default btn-sm dropdown-toggle"
           data-toggle="dropdown">
-    ${_('Sort')}
+    ${_('Sort by:')} <strong>${button_text}</strong>
     <span class="caret"></span>
   </button>
   <ul class="dropdown-menu" role="menu">
     % for sort in sorts:
     <%
     qs = dict(request.GET)
-    sort_by = qs.get('sort_by', 'priority')
-    direction = qs.get('direction', 'asc')
     qs['sort_by'] = sort[0]
     qs['direction'] = sort[1]
     %>
