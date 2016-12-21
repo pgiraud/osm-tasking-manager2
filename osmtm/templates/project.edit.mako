@@ -458,7 +458,6 @@ geometry = loads(str(project.area.geometry.data))
 
 <%block name="labels_">
 <div class="form-group">
-  <label class="control-label">${_('Apply labels to this project.')}</label><br />
     % for l in labels:
     <%
     checked = ""
