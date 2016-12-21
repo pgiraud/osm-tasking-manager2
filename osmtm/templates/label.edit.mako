@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 <%inherit file="base.mako"/>
+<%namespace file="helpers.mako" name="helpers"/>
 <%block name="header">
 <h1>${_('Edit Label')}</h1>
 </%block>
 <%block name="content">
 <div class="container">
     <form method="post" action="" class="">
+      <div class="form-inline">
         <div class="form-group">
           <input type="text" class="form-control" id="id_name" name="name" value="${label.name if label else ''}"
                    placeholder="${_('New label name...')}" />
@@ -21,13 +23,40 @@
             % endfor
           </select>
         </div>
-        % if label:
-        <button type="submit" class="btn btn-success" id="id_submit" name="form.submitted">${_('Save the modifications')}</button>
-        <a class="btn btn-danger" id="delete" href="${request.route_path('label_delete', label=label.id)}">${_('Delete')}</a>
-        % else:
-        <button type="submit" class="btn btn-success" id="id_submit" name="form.submitted">${_('Create label')}</button>
-        % endif
-        <a class="btn btn-default" href="${request.route_path('labels')}">${_('Cancel')}</a>
+      </div>
+      <br>
+      <div class="form-group">
+        <label for="id_short_description" class="control-label">
+          ${_('Description')}
+        </label>
+        ${helpers.locale_chooser(inputname='description')}
+        <div class="tab-content">
+          % for locale, translation in translations:
+            <div id="description_${locale}"
+                 data-locale="${locale}"
+                 class="tab-pane ${'active' if locale == 'en' else ''}">
+              <textarea id="id_description_${locale}"
+                        name="description_${locale}"
+                        class="form-control"
+                        % if label is not None:
+                          placeholder="${label.translations.en.description}"
+                        % endif
+                        rows="3">${translation.description}</textarea>
+            </div>
+          % endfor
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          % if label:
+          <button type="submit" class="btn btn-success" id="id_submit" name="form.submitted">${_('Save the modifications')}</button>
+          <a class="btn btn-danger" id="delete" href="${request.route_path('label_delete', label=label.id)}">${_('Delete')}</a>
+          % else:
+          <button type="submit" class="btn btn-success" id="id_submit" name="form.submitted">${_('Create label')}</button>
+          % endif
+          <a class="btn btn-default" href="${request.route_path('labels')}">${_('Cancel')}</a>
+        </div>
+      </div>
     </form>
 </div>
 <script>

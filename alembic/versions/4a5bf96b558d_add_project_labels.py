@@ -31,7 +31,17 @@ def upgrade():
         sa.ForeignKeyConstraint(['label'], ['label.id'])
     )
 
+    label_translation_table = op.create_table(
+        'label_translation',
+        sa.Column('id', sa.Integer, nullable=False),
+        sa.Column('locale', sa.String(10), nullable=False),
+        sa.Column('description', sa.String),
+        sa.UniqueConstraint('id', 'locale'),
+        sa.ForeignKeyConstraint(['id'], ['label.id'], ondelete="CASCADE")
+    )
+
 
 def downgrade():
     op.drop_table('project_labels')
+    op.drop_table('label_translation')
     op.drop_table('label')

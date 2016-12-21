@@ -717,7 +717,7 @@ class Message(Base):
         self.message = message
 
 
-class Label(Base):
+class Label(Base, Translatable):
     __tablename__ = 'label'
     id = Column(Integer, primary_key=True)
     name = Column(Unicode, nullable=False)
@@ -726,6 +726,12 @@ class Label(Base):
 
     def __init__(self):
         pass
+
+
+class LabelTranslation(translation_base(Label)):
+    __tablename__ = 'label_translation'
+
+    description = Column(Unicode, default=u'')
 
 
 class ExtendedJSONEncoder(JSONEncoder):

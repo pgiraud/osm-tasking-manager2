@@ -5,7 +5,8 @@ from pyramid.httpexceptions import (
 )
 from ..models import (
     DBSession,
-    Label
+    Label,
+    LabelTranslation,
 )
 
 
@@ -42,8 +43,12 @@ def label_edit(request):
     if 'label' in request.matchdict:
         id = request.matchdict['label']
         label = DBSession.query(Label).get(id)
+        translations = label.translations.items()
     else:
         label = None
+        languages = request.registry.settings.available_languages.split()
+        translations = [(language, LabelTranslation(description=''))
+            for language in languages]
 
     if 'form.submitted' in request.params:
         if not label:
@@ -58,7 +63,15 @@ def label_edit(request):
             label.color = request.params['color']
             request.session.flash(_('Project label updated!'), 'success')
 
+        for locale, translation in label.translations.iteritems():
+            with label.force_locale(locale):
+                field = 'description'
+                translated = '_'.join([field, locale])
+                if translated in request.params:
+                    setattr(label, field, request.params[translated])
+                DBSession.add(label)
+
         DBSession.add(label)
         return HTTPFound(location=route_path('labels', request))
 
-    return dict(page_id="labels", label=label)
+    return dict(page_id="labels", label=label, translations=translations)

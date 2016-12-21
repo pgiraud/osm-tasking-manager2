@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 <%inherit file="base.mako"/>
+<%namespace file="helpers.mako" name="helpers"/>
 <%block name="header">
 <h1>${project.id} - ${project.name} - ${_('Edit')}</h1>
 </%block>
@@ -222,7 +223,7 @@ geometry = loads(str(project.area.geometry.data))
         <div class="form-group">
           <label for="id_name" class="control-label">${_('Name of the project')}
           </label>
-          ${locale_chooser(inputname='name')}
+          ${helpers.locale_chooser(inputname='name')}
           <div class="tab-content">
             % for locale, translation in translations:
             <div id="tab_name_${locale}"
@@ -246,7 +247,7 @@ geometry = loads(str(project.area.geometry.data))
           <label for="id_short_description" class="control-label">
             ${_('Short Description')}
           </label>
-          ${locale_chooser(inputname='short_description')}
+          ${helpers.locale_chooser(inputname='short_description')}
           <div class="tab-content">
             % for locale, translation in translations:
               <div id="short_description_${locale}"
@@ -542,7 +543,7 @@ geometry = loads(str(project.area.geometry.data))
 
 <%def name="textarea_with_preview(inputname, size=None)">
   <div class="tab-content">
-    ${locale_chooser(inputname=inputname)}
+    ${helpers.locale_chooser(inputname=inputname)}
     % for locale, translation in translations:
     <div id="tab_${inputname}_${locale}"
          data-locale="${locale}"
@@ -581,33 +582,4 @@ geometry = loads(str(project.area.geometry.data))
     % endfor
   </div>
   ${markdown_link()}
-</%def>
-
-<%def name="locale_chooser(inputname)">
-  <div class="btn-group pull-right" id="locale_chooser_${inputname}">
-    % for locale, translation in translations:
-    <a href
-      class="btn btn-default btn-xs ${'active' if locale == 'en' else ''}"
-      data-locale="${locale}">
-      <span class="${'text-muted' if getattr(translation, inputname) == '' else ''}">
-        ${locale}
-      </span>
-    </a>
-    % endfor
-  </div>
-  <script>
-    $('#locale_chooser_${inputname} a').on('click', function() {
-      $(this).addClass('active');
-      $(this).siblings().removeClass('active');
-      var locale = $(this).attr('data-locale');
-      $(this).parents('.form-group').find('.tab-pane').each(function(index, item) {
-        if ($(item).attr('data-locale') == locale) {
-          $(item).addClass('active');
-        } else {
-          $(item).removeClass('active');
-        }
-      });
-      return false;
-    });
-  </script>
 </%def>
