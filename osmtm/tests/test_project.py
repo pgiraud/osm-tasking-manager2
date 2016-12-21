@@ -968,49 +968,43 @@ class TestProjectFunctional(BaseTestCase):
     def test_projects__search_label(self):
         res = self.testapp.get('/projects', status=200,
                                params={
-                                   'search': 'label:foo'
+                                   'labels': 'foo'
                                })
         projects = res.html.select('.project')
         self.assertEqual(len(projects), 0)
 
         res = self.testapp.get('/projects', status=200,
                                params={
-                                   'search': 'label:bar'
+                                   'labels': 'bar'
                                })
         projects = res.html.select('.project')
         self.assertEqual(len(projects), 1)
 
         res = self.testapp.get('/projects', status=200,
                                params={
-                                   'search': 'lorem label:bar'
+                                   'search': 'lorem',
+                                   'labels': 'bar'
                                })
         projects = res.html.select('.project')
         self.assertEqual(len(projects), 1)
 
         res = self.testapp.get('/projects', status=200,
                                params={
-                                   'search': 'label:bar lorem'
+                                   'labels': '"dude label"'
                                })
         projects = res.html.select('.project')
         self.assertEqual(len(projects), 1)
 
         res = self.testapp.get('/projects', status=200,
                                params={
-                                   'search': 'label:"dude label"'
+                                   'labels': 'bar "dude label"'
                                })
         projects = res.html.select('.project')
         self.assertEqual(len(projects), 1)
 
         res = self.testapp.get('/projects', status=200,
                                params={
-                                   'search': 'label:bar label:"dude label"'
-                               })
-        projects = res.html.select('.project')
-        self.assertEqual(len(projects), 1)
-
-        res = self.testapp.get('/projects', status=200,
-                               params={
-                                   'search': 'label:bar label:foo'
+                                   'labels': 'bar foo'
                                })
         projects = res.html.select('.project')
         self.assertEqual(len(projects), 0)

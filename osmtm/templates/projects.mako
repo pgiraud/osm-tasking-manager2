@@ -13,16 +13,6 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
 <%
   total = ngettext('${total} project', '${total} projects', paginator.item_count, mapping={'total': paginator.item_count})
 %>
-<%
-  qs = dict(request.GET)
-  default_sort = qs.get('sort_by', 'priority') == 'priority'
-  default_direction = qs.get('direction', 'asc') == 'asc'
-  default_search = qs.get('search', '') == ''
-  my_projects = qs.get('my_projects')
-  show_archived = qs.get('show_archived')
-  default_filter = default_sort and default_direction and default_search and \
-    not my_projects and not show_archived
-%>
 
 <form role="form"
       action="${request.current_route_url()}"
@@ -46,19 +36,6 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
           </div>
         </div>
       </div>
-      % if not default_filter:
-      <div class="row">
-        <div class="col-md-12">
-          <div class="form-group">
-            <a class="btn btn-link btn-sm"
-               href="${request.route_path('projects')}">
-              <i class="glyphicon glyphicon-remove"></i>
-              ${_('Clear current search query, filters, and sorts')}
-            </a>
-          </div>
-        </div>
-      </div>
-      % endif
       <div class="panel panel-default">
         <div class="panel-heading panel-heading-no-padding">
           <div class="navbar">
@@ -90,7 +67,7 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
           if request.locale_name:
             label.locale = request.locale_name
         %>
-        % if label.name in search['labels'] and label.description:
+        % if label.name in query_labels and label.description:
           <div class="panel panel-default">
             <div class="panel-heading">
               <h3 class="panel-title">
@@ -308,14 +285,13 @@ sorts = [('priority', 'asc', _('High priority first')),
     label_id = label.name
     if re.findall(ur'\s', label_id):
       label_id = '\"' + label_id + '\"'
-    label_filter = 'label:%s' % label_id
-    search_filter = qs.get('search', '')
+    label_filter = qs.get('labels', '')
     found = False
-    if label_filter in search_filter:
+    if label_id in label_filter:
       found = True
-      qs['search'] = qs['search'].replace(label_filter, '')
+      qs['labels'] = qs['labels'].replace(label_id, '').strip()
     else:
-      qs['search'] = (search_filter + ' ' + label_filter).strip()
+      qs['labels'] = (label_filter + ' ' + label_id).strip()
     %>
     <li>
       <a href="${request.current_route_url(_query=qs.items())}">

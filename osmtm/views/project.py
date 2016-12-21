@@ -81,12 +81,12 @@ log = logging.getLogger(__name__)
 @view_config(route_name="projects", renderer='projects.mako', http_cache=0)
 def projects(request):
     check_project_expiration()
-    search = parse_search(request.params.get('search', ''))
-    paginator = get_projects(request, 10, search=search)
+    paginator = get_projects(request, 10)
 
     labels = DBSession.query(Label).all()
+    query_labels = extract_labels(request.params.get('labels', ''))
     return dict(page_id="home", paginator=paginator, labels=labels,
-                search=search)
+                query_labels=query_labels)
 
 
 @view_config(route_name='projects_json', renderer='json')
@@ -99,30 +99,18 @@ def projects_json(request):
     return FeatureCollection([project.to_feature() for project in paginator])
 
 
-def parse_search(s):
-
-    '''This pulls out search strings with "label:" from the query
-       and searches for project labels that match those strings.'''
-    label_regex = r"label:(\"([^\"]+)\"|'([^']+)'|(\S+))\s*"
+def extract_labels(s):
+    label_regex = r"\"([^\"]+)\"|'([^']+)'|(\S+)"
     matches = re.finditer(label_regex, s)
 
     labels = []
     for num, match in enumerate(matches):
         '''We don't want the first group of the match since it's the full
            text'''
-        labels.append([g for g in match.groups()[1::] if g is not None][0])
+        labels.append([g for g in match.groups() if g is not None][0])
+    return labels
 
-    '''Remove any label from the search strings and move on to the next
-       search criteria'''
-    s = re.sub(label_regex, '', s).strip()
-
-    return {
-        'labels': labels,
-        'remaining': s
-    }
-
-
-def get_projects(request, items_per_page, filter=True, search=None):
+def get_projects(request, items_per_page, filter=True):
     query = DBSession.query(Project) \
         .options(joinedload(Project.translations['en'])) \
         .options(joinedload(Project.translations[request.locale_name])) \
@@ -145,8 +133,9 @@ def get_projects(request, items_per_page, filter=True, search=None):
     if not user or (not user.is_admin and not user.is_project_manager):
         filter = and_(Project.status == Project.status_published, filter)
 
-    if search and search['labels']:
-        labels = search['labels']
+    if 'labels' in request.params:
+        labels = extract_labels(request.params.get('labels', ''))
+
         if len(labels) > 0:
             ids = DBSession.query(Project.id) \
                       .filter(and_(*[Project.labels.any(name=label)
@@ -157,15 +146,12 @@ def get_projects(request, items_per_page, filter=True, search=None):
                 # IN-predicate  with emty sequence can be expensive
                 filter = and_(False == True, filter)  # noqa
 
-    if search and search['remaining'] and search['remaining'] != '':
-
-        s = search['remaining']
+    if request.params.get('search', '') != '':
+        s = request.params.get('search')
         PT = ProjectTranslation
-
         search_filter = or_(PT.name.ilike('%%%s%%' % s),
                             PT.short_description.ilike('%%%s%%' % s),
                             PT.description.ilike('%%%s%%' % s),)
-
         '''The below code extracts all the numerals in the
            search string as a list, if there are some it
            joins that list of number characters into a string,

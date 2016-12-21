@@ -30,7 +30,7 @@
   %>
   <a class="label label-default"
      style="background-color: ${label.color};color: ${label.color|contrast}"
-     href="${request.route_url('projects', _query={'search': 'label:' + label_id})}">${label.name}</a>
+     href="${request.route_url('projects', _query={'labels': label_id})}">${label.name}</a>
 </%def>
 
 <%def name="locale_chooser(inputname)">
