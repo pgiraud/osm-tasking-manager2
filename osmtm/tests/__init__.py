@@ -70,10 +70,12 @@ def populate_db():
 
     label0 = Label()
     label0.name = u'bar'
+    label0.color = u'#ff0000'
     DBSession.add(label0)
 
     label1 = Label()
     label1.name = u'dude label'
+    label1.color = u'#ff0000'
     DBSession.add(label1)
 
     shape = shapely.geometry.Polygon(
