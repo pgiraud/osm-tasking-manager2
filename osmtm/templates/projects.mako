@@ -36,6 +36,29 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
           </div>
         </div>
       </div>
+      <div class="row">
+        <div class="col-md-12">
+          % for label in labels:
+          <%
+          import re
+          from osmtm.mako_filters import contrast
+          qs = dict(request.GET)
+
+          label_id = label.name
+          if re.findall(ur'\s', label_id):
+            label_id = '\"' + label_id + '\"'
+          if 'labels' in qs:
+            qs['labels'] = qs['labels'].replace(label_id, '').strip()
+          %>
+          % if label.name in query_labels:
+          <a class="label label-default"
+             style="background-color: ${label.color};color: ${label.color|contrast}"
+             href="${request.route_url('projects', _query=qs.items())}">${label.name} &times;</a>
+          % endif
+          % endfor
+        </div>
+      </div>
+      <br>
       <div class="panel panel-default">
         <div class="panel-heading panel-heading-no-padding">
           <div class="navbar">
