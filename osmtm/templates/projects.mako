@@ -58,30 +58,23 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
           % endfor
         </div>
       </div>
-      <br>
-      <div class="panel panel-default">
-        <div class="panel-heading panel-heading-no-padding">
-          <div class="navbar">
-            <strong class="navbar-text">
-              ${total}
-            </strong>
-            <div class="navbar-right navbar-form">
-              ${other_filters()}
-              ${label_filter()}
-              ${sort_filter()}
-              &nbsp;
-            </div>
-          </div>
+      <div class="navbar navbar-no-margin">
+        <strong class="navbar-text">
+          ${total}
+        </strong>
+        <div class="navbar-right navbar-form">
+          ${other_filters()}
+          ${label_filter()}
+          ${sort_filter()}
+          &nbsp;
         </div>
-        <ul class="list-group">
-        % if paginator.items:
-            % for project in paginator.items:
-              ${project_block(project=project, base_url=base_url,
-                              priorities=priorities)}
-            % endfor
-        % endif
-        </ul>
       </div>
+      % if paginator.items:
+          % for project in paginator.items:
+            ${project_block(project=project, base_url=base_url,
+                            priorities=priorities)}
+          % endfor
+      % endif
       ${paginate()}
     </div>
     <div class="col-md-4">
@@ -124,7 +117,7 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
     else:
         status = ''
 %>
-<li class="project list-group-item ${status.lower()}">
+<div class="project well ${status.lower()}">
   <ul class="nav project-stats">
     <li>
       <table>
@@ -177,7 +170,7 @@ priorities = [_('urgent'), _('high'), _('medium'), _('low')]
   <br>
   ${helpers.display_project_info(project=project)}
   <br>
-</li>
+</div>
 </%def>
 
 <%def name="paginate()">
