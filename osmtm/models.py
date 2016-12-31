@@ -123,6 +123,9 @@ class User(Base):
     __tablename__ = "users"
     id = Column(BigInteger, primary_key=True, index=True)
     username = Column(Unicode)
+    email = Column(Unicode)
+    confirmed = Column(Boolean, default=False, nullable=False)
+    confirmed_on = Column(DateTime)
     role_admin = ADMIN
     role_project_manager = PROJECT_MANAGER
     role = Column(Integer)
